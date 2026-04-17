@@ -17,7 +17,7 @@
 - [x] **B9** – Duplizierte Komponenten ohne Unterschied: `haptic-tab.tsx` / `HapticTab.tsx` und `icon-symbol.tsx` / `IconSymbol.tsx`
 - [x] **B10** – `app/(tabs)/explore.tsx`: Expo-Boilerplate-Screen gehört nicht in die App
 - [x] **B11** – `app/(dm)/children.tsx`: Kinder-Verwaltung liest `MOCK_USERS` statt Firestore – Änderungen im Spiel (Level, XP) werden im DM-Bereich nicht angezeigt
-- [ ] **B12** – `contexts/ShopContext.tsx`: Gekaufte Items (Heiltrank, Schild, Schwert) haben keinen Spieleffekt – Währung wird abgezogen, aber kein Inventar / keine Kampf-Modifikatoren existieren
+- [x] **B12** – `contexts/ShopContext.tsx`: Gekaufte Items (Heiltrank, Schild, Schwert) haben keinen Spieleffekt – Währung wird abgezogen, aber kein Inventar / keine Kampf-Modifikatoren existieren
 - [x] **B13** – `app/(dm)/index.tsx`: Kein PIN-Schutz vor dem Dungeonmaster-Bereich – jedes Kind kann Aufgaben und Münzen manipulieren (sicherheitskritisch für Verkaufsprodukt)
 
 ---
