@@ -1,0 +1,331 @@
+Besen & Bestien - Gamifizierte Haushalts-App
+
+Vision
+- B&B verwandelt Haushaltsaufgaben in ein spannendes Abenteuer-Spiel, bei dem Kinder durch das Erledigen realer Aufgaben virtuelle Bestien besiegen und Taschengeld verdienen.
+
+Zielgruppe
+- Primär: Familien mit Kindern ab 6 Jahren
+- Sekundär: Erweiterung auf jüngere Kinder (4-5 Jahre) mit visueller Unterstützung
+
+Kernwert
+- Motivation von Kindern zur selbstständigen Haushaltsarbeit durch Gamification und transparentes Belohnungssystem.
+
+Authentifizierung & Benutzerverwaltung
+- Zwei Möglichkeiten:
+-- NFC-Figur (erst in späterer Version verfügbar):  
+--- Jeder Nutzer erhält eine personalisierte 3D-Figur mit NFC-Tag
+--- Login durch Auflegen der Figur auf das Tablet
+--- Automatischer Logout nach Inaktivität (konfigurierbar)
+--- Gastmodus für neue Familienmitglieder
+-- Virtuelle Figur:
+--- Jeder Nutzer kreiert seinen eigenen Avatar
+--- Login durch Auswahl der Figur
+--- Automatischer Logout nach Inaktivität (konfigurierbar)
+--- Anlegen neuen virtueller Figuren durch Admin
+
+Benutzerrollen
+- Dungeonmaster (DM) (Eltern)
+-- Vollzugriff auf alle Funktionen
+-- Aufgabenverwaltung (CRUD)
+-- Münz-zu-Taschengeld Einstellungen
+-- Spielerkonten verwalten
+-- Statistiken einsehen
+-- Master-PIN für Notfall-Zugriff
+- Helden (Kinder)
+-- Zugriff auf Spielbereich
+-- Charakteranpassung
+-- Aufgabenauswahl und -abschluss
+-- Inventarverwaltung
+-- Eigene Statistiken einsehen
+
+Aufgabenverwaltung
+- Aufgabentypen
+-- Einmalige Aufgaben
+--- Einmal erstellbar und erledigbar
+-- Wiederkehrende Aufgaben
+--- Täglich/Wöchentlich/Monatlich/Auswahl bestimmter Wochentage (jeden Mo, Mi, Fr)
+--- Automatisches Zurücksetzen
+- Aufgabenattribute
+-- Name: Max. 50 Zeichen
+-- Beschreibung: Optional, max. 200 Zeichen
+-- Schwierigkeitsgrad: 
+	Leichte Aufgaben bringen 5 XP und 3 Schritte
+	Mittlere Aufgaben bringen 10 XP und 6 Schritte
+	Schwere Aufgaben bringen 15 XP und 9 Schritte
+-- Zugewiesen an: Ausgewählten Helden oder "Alle"
+-- Deadline: (zwischen Montag und Sonntag)
+-- Wiederholung: Intervall-Einstellung
+
+Avatardesigner 
+-zu Beginn des ersten Spiels (Änderungen später über Einstellungen möglich): 
+-- Name
+-- Auswahl einer Klasse (mit kurzer Textbeschreibung, die für Kinder leicht verständlich ist, und die Vor- und Nachteilen, die der Spieler durch diese Klasse bekommt und Auswirkungen auf das Kampfverhalten, das Einsammeln von Gegenständen oder die Bewegungsreichweite hat (siehe 'Buch der Klassen'))
+-- Aussehen soll mithilfe von Slidern selbst bestimmt werden (je Klasse werden mehrere Bilder zur Verfügung gestellt)
+-- Farbwahl (als Hintergrund für den Avatar)
+-- Der Avatar soll im Kampf, auf dem Hauptbildschirm und in der Karte zu sehen sein; das Lvl soll direkt am Avatar stehen
+-- Level der Helden startet bei 1 und steigt mit Erfahrungspunkten (XP)
+
+Spielmechanik
+-Kartensystem
+-- Isometrische 2D-Karte mit verschiedenen Biomen ("Welten")
+-- 50 Wegpunkte je Welt
+-- Jeder 6. Wegpunkt ist eine Bestie (manchmal sehen Bestien in der Karte aus wie Schätze, sind aber Mimikry (=Bestie))
+-- Jeder 24. Wegpunkt ist ein Schatz (enthält zwischen 5 und 20 Münzen, willkürlich verteilt)
+-- Wenn der Held z.B. 5 Wegpunkte laufen darf, aber nach 3 Schritten eine Bestie kommt, wird dieses zuerst angegriffen und danach die restlichen Schritte gelaufen
+- Kampfsystem
+-- Das Kampfsystem funktioniert wie in den ersten Pokemon-Spielen (Held und Bestie haben LP abhängig vom Level, jeder Angriff hat unterschiedliche Angriffspunkte (AP), die auf die LP zielen. Ziel ist es, den Gegner auf 0 LP zu bekommen
+-- Helden greifen immer zuerst an
+-- Der Angreifer greift mit seinen Angriffspunkten (AP) die Lebenspunkte (LP) des Verteidigers an. Wenn die LP der Bestie auf 0 gehen, wurde es besiegt und der Held bekommt Münzen (oder nach Erreichen des Münz-Wochenziels Edelsteine für den Shop) (Höhe je nach Stärke der Bestie, siehe 'Buch der Bestien'). Sollte die LP des Helden auf 0 gehen, flieht die Bestie, der Held geht leer aus und darf auch nicht weiterlaufen. Er muss dann erst mehr XP durch weitere Aufgaben verdienen, um stärker zu werden und die Bestie besiegen zu können. 
+--- übrige Schritte nach einem verlorenen Kampf bleiben trotzdem erhalten und werden zu neuen Schritten hinzuaddiert, wenn weitere Aufgaben erfüllt wurden 
+--Im Kampf soll der erstellte Avatar des Helden zu sehen sein
+-Spielablauf:
+1. Held loggt sich mit seiner NFC-Figur oder seiner virtuellen Figur ein 
+2. Held wählt verfügbare Aufgabe 
+2.1 automatischer Log-Out nach 10 Minuten Inaktivität oder durch Log-Out Button
+3. Held erledigt verfügbare Aufgabe im realen Leben
+4. Held (loggt sich ggf. wieder ein und) erhält für seine erledigte Aufgabe Schritte und XP
+5. Held bewegt sich auf der Karte um eine beliebige Schrittzahl (max. Verfügbarkeit durch erledigte Aufgaben limitiert) weiter und trifft dabei ggf. auf einen Schatz, den er einsammelt oder auf eine Bestie, die er bekämpfen muss
+6. Besiegt der Held die Bestie, erhält er Münzen oder Edelsteine (Höhe abhängig von Klasse und Art der Bestie)
+-Münzsystem
+--Wöchentlicher Zyklus (Montag 00:00 - Sonntag 23:59)
+-- Mindest-Münzzahl/Woche: wird von Eltern festgelegt oder entspricht der Taschengeldempfehlung des Bundesministeriums für Bildung, Familie, Senioren, Frauen und Jugend:
+	Unter 6 Jahre:	            1,00-2,00 Euro/Woche	Wochenlimit: 10 Münzen
+	6 Jahre:	            2,00-2,50 Euro/Woche	Wochenlimit: 20 Münzen
+	7 Jahre:	            2,50-3,00 Euro/Woche	Wochenlimit: 30 Münzen
+	8 Jahre:	            3,00-3,50 Euro/Woche	Wochenlimit: 35 Münzen
+	9 Jahre:	            3,50-4,00 Euro/Woche	Wochenlimit: 40 Münzen
+	10 Jahre:	            20,00-22,50 Euro/Monat	Wochenlimit: 50 Münzen
+	11 Jahre:	            22,50-25,00 Euro/Monat	Wochenlimit: 60 Münzen
+	12 Jahre:	            25,00-27,50 Euro/Monat	Wochenlimit: 65 Münzen
+-- Verfallsmechanik: Werden weniger Münzen als das Wochenlimit gesammelt, verfallen alle Münzen dieser Woche
+-- Sobald das Wochenlimit erreicht wurde, erhält der Held einen Sticker dafür in sein Tagebuch und für jeden weiteren Kampf in dieser Woche sammelt der Held statt Münzen Edelsteine (in gleicher Höhe), die im Shop eingelöst werden können
+--Edelsteine bleiben bis zu ihrer Einlösung erhalten, Münzen werden am Ende der Woche ggf. ausgezahlt und in jedem Fall automatisch zurückgesetzt
+-Helden-System
+	Level 1: 0-30 XP
+	Level 2: 31-60 XP		
+	Level 3: 61-90 XP
+	Level 4: 91-120 XP
+	Level 5: 121-150 XP
+	usw.
+-- Helden KP-Berechnung nach folgendem Prinzip:
+	KP = 15 + (XP * 0,25) + Klassenbonus (Klassenmodifikatoren siehe 'Buch der Klassen')
+--- Angriffe Klassenbedingt (siehe 'Buch der Klassen'); Neuer Angriff jedes 10. Level
+- AP wachsen mit XP
+- Angriffspunkte (AP) werden folgendermaßen berechnet: 
+	AP = BasisAP + (XP * 0,05) + Klassenbonus (BasisAP und Klassenmodifikatoren siehe 'Buch der Klassen')
+
+-Shopsystem
+--Nach erreichen des Wochen-Münzziels können keine weiteren Münzen mehr gesammelt werden. Stattdessen werden ab dann bis zum Start der nächsten Woche Edelsteine (in gleicher Höhe wie es sonst Münzen gewesen wären) und Sticker (siehe 'Tagebuch') gesammelt.
+-- Die Münzen können im Shop eingelöst werden, entweder gegen Ingame-Items oder gegen reale Specials, die von den Eltern festgelegt werden:
+---Ingame-Items:
+### **Ausrüstung & Waffen**
+1. **Flinke Stiefel** (+1 AP, 10 Edelsteine)
+2. **Starker Gürtel** (+2 KP, 10 Edelsteine)
+3. **Glitzernde Rüstung** (+5 KP, 20 Edelsteine)
+4. **Magischer Umhang** (+1 Schritt nach jedem Kampf, 15 Edelsteine)
+5. **Doppelklinge** (+2 AP, 20 Edelsteine)
+6. **Schutzschild** (Reduziert Schaden um 1 AP pro Kampf, 15 Edelsteine)
+7. **Feuerhandschuhe** (+1 AP gegen Feuer-Bestien, 10 Edelsteine)
+8. **Wasserstiefel** (+1 Schritt in Wasser-Biomen, 10 Edelsteine)
+9. **Drachenhelm** (+3 KP gegen schwere Bestien, 15 Edelsteine)
+10. **Blitzdolch** (+1 AP bei jedem ersten Angriff, 12 Edelsteine)
+
+### **Tränke & Einmal-Items**
+11. **Heiltrank** (Stellt 10 KP im Kampf wieder her, 5 Edelsteine)
+12. **XP-Trank** (+10 XP sofort, 10 Edelsteine)
+13. **Münzbeutel** (+5 Münzen sofort, 10 Edelsteine)
+14. **Schritttrank** (+3 Schritte sofort, 8 Edelsteine)
+15. **Stärketrank** (+2 AP für den nächsten Kampf, 7 Edelsteine)
+16. **Schutztrank** (Nächster Angriff des Gegners halbiert, 8 Edelsteine)
+17. **Glückstrank** (Doppelte Münzen beim nächsten Schatz, 12 Edelsteine)
+18. **Wachstumstrank** (+1 Level sofort, 25 Edelsteine)
+19. **Unsichtbarkeitstrank** (Monster auf dem nächsten Wegpunkt wird übersprungen, 15 Edelsteine)
+20. **Rückruftrank** (Zurück zum letzten Schatzpunkt, 10 Edelsteine)
+
+### **Kosmetische Items & Begleiter**
+21. **Katzenohren-Hut** (nur Optik, 5 Edelsteine)
+22. **Regenbogen-Umhang** (nur Optik, 8 Edelsteine)
+23. **Glitzernde Schuhe** (nur Optik, 6 Edelsteine)
+24. **Mini-Drache** (Begleiter, 15 Edelsteine)
+25. **Schwebende Fee** (Begleiter, 12 Edelsteine)
+26. **Schmetterlingsflügel** (nur Optik, 10 Edelsteine)
+27. **Piratenhut** (nur Optik, 7 Edelsteine)
+28. **Zauberstab** (nur Optik, 8 Edelsteine)
+29. **Ritterhelm** (nur Optik, 8 Edelsteine)
+30. **Froschfreund** (Begleiter, 10 Edelsteine)
+
+### **Spezialeffekte & Boosts**
+31. **Doppelte XP für 1 Stunde** (20 Edelsteine)
+32. **Doppelte Münzen beim nächsten Monster** (15 Edelsteine)
+33. **+2 Schritte für die nächste Aufgabe** (8 Edelsteine)
+34. **Sofortiger Schatz auf der Karte** (20 Edelsteine)
+35. **Monster-Scanner** (Zeigt das nächste Monster auf der Karte an, 7 Edelsteine)
+36. **Schatz-Scanner** (Zeigt den nächsten Schatz auf der Karte an, 7 Edelsteine)
+37. **Bestienbuch-Seite** (Deckt eine neue Bestie im Buch auf, 10 Edelsteine)
+38. **Weltenticket** (Sofortiger Zugang zur nächsten Welt, 25 Edelsteine)
+39. **Stickerpaket** (3 zufällige Sticker fürs Tagebuch, 6 Edelsteine)
+40. **Tauschstein** (Tausche 10 Edelsteine gegen 5 Münzen, 10 Edelsteine)
+
+### **Sammelobjekte & Spaß-Items**
+41. **Goldener Löffel** (Sammelobjekt, 5 Edelsteine)
+42. **Rubin-Amulett** (Sammelobjekt, 7 Edelsteine)
+43. **Smaragd-Ring** (Sammelobjekt, 7 Edelsteine)
+44. **Zauberbuch** (Sammelobjekt, 8 Edelsteine)
+45. **Bestienfigur** (Sammelobjekt, 8 Edelsteine)
+46. **Weltkarte** (Sammelobjekt, 6 Edelsteine)
+47. **Glücksbringer** (Sammelobjekt, 5 Edelsteine)
+48. **Abenteurer-Medaille** (Sammelobjekt, 10 Edelsteine)
+49. **Freundschaftsarmband** (Sammelobjekt, 5 Edelsteine)
+50. **Besen-Trophäe** (Sammelobjekt, 12 Edelsteine)
+
+---Outgame Items
+-Drop-Down Menü für Eltern zur Auswahl verschiedener Aktivitäten und Belohnungen
+-- Eis essen
+-- Kinobesuch
+-- Filmabend
+-- Extra Lesezeit
+--...
+-Eingabefeld für eigene Ideen
+
+-Klassensystem
+Klassen haben Auswirkungen darauf, wie viele Schritte der Held nach dem Kampf auf der Karte laufen darf, wie viele Erfahrungspunkte (XP), Angriffspunkte (AP) und Kampfpunkte (LP) der Held hat und wie viele Münzen der Held nach dem Kampf oder beim Finden eines Schatzes bekommt.
+
+-Tutorial
+- Tutorial zu Beginn des ersten Spiels (nach der Wahl "Spiel mit NFC-Figur" vs. "Spiel mit virtueller Figur"; Tutorial je nach Auswahl angepasst) 
+
+-Bibliothek
+In der Bibliothek stehen alle Bücher, die für BnB wichtig sind (Buch der Bestien, Buch der Klassen, Buch der Welten, Tagebuch, Spielanleitung). Die Bibliothek kann von jedem Spieler jederzeit eingesehen werden. Die Tagebücher sind personalisiert ('Tagebuch von ...') und können auch jeweils von den anderen Spielern gegenseitig betrachtet werden.
+
+Tagebuch
+- Die Tagebücher sind eine Art Statistik jedes einzelnen Spielers. 
+- Jede Seite ist ein Monat ( Januar 2025; Februar 2025; usw) und wiederum in die einzelnen Wochen unterteilt.
+- Jeder Wochenabschnitt zeigt:
+-- Einen Sticker für jedes erledigte Bestie in dieser Woche
+-- Einen Sticker für jede neu betretene Welt in dieser Woche
+-- Einen Sticker, wenn das Wochen-Münzziel erreicht wurde
+-- Einen Sticker für jede Aufgabe, die über das Wochen-Münzziel hinaus erledigt wurde
+- Am Ende jeder Seite steht die gesamte Anzahl an gesammelten Diamanten und ein Button mit "Jetzt einlösen" (siehe 'Shopsystem')
+
+Buch der Bestien
+- Im Buch der Bestien stehen alle Bestien, die es in BnB gibt
+- Unter jeder Bestie ist eine Checkbox. Wenn der Held das erste mal eines dieser Besiegt besiegt hat, wird die Checkbox automatisch abgehakt
+- Eine Statusleiste zeigt an, wie viele Bestien es insgesamt gibt und wie viele davon schon entdeckt wurden 
+- Die Angriffe sollen sich auch optisch unterscheiden (eine Flamme bei einem Feuerangriff, eine Welle bei einem Wasserangriff usw.)
+- Bestien:
+--Leicht (10-15 KP, 2-5 AP, Loot: 5 Münzen (+ggf. Klassenmodifikatoren, siehe 'Buch der Klassen')): Schleim, Käfer, Mimikry, Fledermaus, Spinne, fleischfressende Raupe, Krabbe, Ratte, Piranha, Flammli
+--Mittel (20-25 KP, 6-10 AP, Loot: 10 Münzen (+ggf. Klassenmodifikatoren, siehe 'Buch der Klassen')): Goblin, Wolf, Fuchs, Feuerteufel, Zombie, Skelett, Krake, Falke, Schwertfisch, Giftkröte, Qualle, Leguan
+--Schwer (30-35 KP, 11-15 AP, Loot: 15 Münzen (+ggf. Klassenmodifikatoren, siehe 'Buch der Klassen')): Drache, Bär, Hai, Klapperschlange, Dunkler Ritter, Feuerfuchs, Pfeilgiftfrosch
+
+Buch der Welten
+- Im Buch der Welten stehen alle Welten mit ihren jeweiligen Biomen und Bestien, die es in BnB gibt
+- Unter der Welt ist eine Checkbox. Wenn der Held das erste mal die Welt betreten hat, wird die Checkbox automatisch abgehakt
+- Eine Statusleiste zeigt an, wie viele Welten es insgesamt gibt und wie viele davon schon entdeckt wurden
+-Welten:
+--Biom: Wald, Bestien: Käfer, Mimikry, Fledermaus, Spinne, fleischfressende Raupe, Wolf, Falke, Giftkröte, Bär
+--Biom: Wüste, Bestien: Käfer, Mimikry, Fledermaus, Spinne, Wüstengoblin, Wüstenfuchs, Wüstenzombie, Skelett, Falke, Klapperschlange
+--Biom: Meer, Bestien: Mimikry, Krabbe, Piranha, Skelett, Krake, Schwertfisch, Qualle, Hai
+--Biom: Stadt, Bestien: Käfer, Schleim, Mimikry, Fledermaus, Spinne, Ratte, Dunkler Ritter
+--Biom: Mine, Bestien: Mimikry, Fledermaus, Flammli, Minengoblin, Minenzombie, Skelett, Drache
+--Biom: Vulkaninsel, Bestien: Mimikry, Fledermaus, Ratte, Flammli, Feuerteufel, Skelett, Falke, Leguan, Feuerfuchs
+--Biom: Sumpf, Bestien: Käfer, Mimikry, Fledermaus, Spinne, fleischfressende Raupe, Ratte, Sumpfgoblin, Sumpfzombie, Skelett, Giftkröte, Pfeilgiftfrosch
+
+Buch der Klassen
+- Im Buch der Klassen werden alle Klassen beschrieben, die es in BnB gibt.
+- Die Klassen mit ihren Attributen und Angriffen, geordnet nach Klasse und Level, sollen in mehrere sinnvoll voneinander getrennte Dateien programmiert werden, damit ich sie später jederzeit leicht erweitern und warten kann
+- Klassen:
+--  Barbar: 
+--- Primäres Attribut: Stärke
+--- Vorteil: +2 AP
+--- Nachteil: -1 Schritte
+--- Angriffe:
+	Lvl 1:  Hammerschlag – Ein kräftiger Schlag mit dem Hammer trifft deinen Gegner. 7 AP.
+	Lvl 10: Brüller – Du brüllst so laut, dass dein Gegner erschrickt. 30%ige Chance, dass dein Gegner beim nächsten Angriff noch verwirrt ist und mit -2 AP angreift. 8 AP.
+	Lvl 20: Stampfer – Du stampfst fest auf den Boden und erschütterst damit deinen Gegner. 9 AP.
+	Lvl 30: Wilde Drehung – Du drehst dich und triffst alles um dich herum mit einem kräftigen Schlag. 10 AP.
+	Lvl 40: Axthieb – Du schwingst deine Axt mit voller Kraft auf deinen Gegner. 12 AP.
+	Lvl 50: Felsenwurf – Du wirfst einen schweren Stein auf deinen Gegner. 13 AP.
+	Lvl 60: Rasender Angriff – Du rennst los und schubst deinen Gegner um. 30%ige Chance, dass dein nächster Angriff +2 AP bekommt. 15 AP. 
+	Lvl 70: Schmetterschlag – Ein besonders starker Schlag, der deinen Gegner zurückwirft. 16 AP.
+	Lvl 80: Doppelhieb – Du schlägst zweimal ganz schnell hintereinander auf deinen Gegner ein. 2x9 AP. 
+	Lvl 90: Tosende Lawine – Du rollst wie eine Lawine auf deinen Gegner zu. 30%ige Chance, dass dein Gegner beim nächsten Mal nur mit seiner halben AP angreifen kann. 22 AP.
+
+--  Druide:
+--- Primäres Attribut: Naturverbundenheit
+--- Vorteil: +2 Schritte
+--- Nachteil: -1 AP
+--- Angriffe:
+	Lvl 1:  Blätterwirbel – Viele Blätter wirbeln um deinen Gegner und schneiden ihn. 6 AP.
+	Lvl 10: Wolkenstoß – Eine Wolke pustet den Gegner zurück. 7 AP.
+	Lvl 20: Blumenbombe – Bunte Blumen ploppen um deinen Gegner herum auf und explodieren.8 AP. 
+	Lvl 30: Fesselnde Ranken – Ranken fesseln deinen Gegner. 30%ige Chance, dass dein Gegner im nächsten Zug nicht angreifen kann. 9 AP.
+	Lvl 40: Tierwirbel – Tiere aus der Umgebung umzingeln deinen Gegner und verwirren ihn. 12 AP. 
+ 	Lvl 50: Pilzexplosion – Viele kleine Pilze platzen vor deinem Gegner und vergiften ihn. 13 AP.  
+	Lvl 60: Regentanz – Du rufst Regen, der alles rutschig macht. 14 AP.
+	Lvl 70: Wurzelgriff – Eine Wurzel hält den Fuß deines Gegners fest und verlangsamt ihn. 30%ige Chance, dass dein Gegner beim nächsten Mal mit halber AP angreift. 15 AP.
+	Lvl 80: Donnerschlag – Ein lauter Donner schlägt deinen Gegner zu Boden. 16 AP. 
+	Lvl 90: Erdbeben – Die Erde bebt, der Gegner fällt ohnmächtig zu Boden. 30%ige Chance, dass dein Gegner im nächsten Zug noch nicht wieder wach ist. 20 AP.
+
+--  Zauberer:
+--- Primäres Attribut: Intelligenz
+--- Vorteil: +2 LP
+--- Nachteil: -1 Münze
+--- Angriffe:
+	Lvl 1:  Eisstrahl – Ein kalter Strahl aus blauem Eis trifft deinen Gegner. 6 AP.
+	Lvl 10: Lichtblitz – Ein heller Lichtblitz blendet deinen Gegner. 30%ige Chance, dass dein Gegner dich beim nächsten Angriff verfehlen. 7 AP.
+	Lvl 20: Feuerball – Ein heißer Ball aus purem Feuer fliegt auf deinen Gegner zu. 9 AP.
+	LvL 30: Blitzschlag – Ein greller Blitz trifft deinen Gegner. 10 AP.
+	Lvl 40: Windstoß – Ein kräftiger Wind stößt deinen Gegner weg. 12 AP. 
+	Lvl 50: Funkenregen – Viele kleine Funken regnen auf deinen Gegner nieder. 30%ige Chance, dass dein Gegner für seinen nächsten Angriff 2 AP verliert. 13 AP.
+	Lvl 60: Schwebekugel – Eine Metallkugel kommt aus dem Nichts angeflogen und trifft deinen Gegner. 14 AP. 
+	Lvl 70: Regenbogenstrahl – Ein bunter Lichtstrahl durchbohrt deinen Gegner. 15 AP.
+	Lvl 80: Meteorschauer – Tausende kleiner Meteoriten treffen deinen Gegner. 16 AP.
+	Lvl 90: Schlafwolke – Dein Gegner wird müde und schläft eine Runde. 30%ige Chance, dass dein Gegner die nächste Runde verschläft. 18 AP.
+
+--  Schurke:
+--- Primäres Attribut: Geschicklichkeit
+--- Vorteil: +2 Münzen
+--- Nachteil: -1 LP
+--- Angriffe:
+	Lvl 1:  Klingensprung – Du springst vor und triffst deinen Gegner schnell mit deiner Klinge. 6 AP.
+	Lvl 10: Dolchstoß – Blitzschnell stichst du mit deinem Dolch zu. 7 AP.
+	Lvl 20: Sandwurf – Du wirfst Sand in die Augen deines Gegners. 30%ige Chance, dass dein Gegner dich beim nächsten mal nicht trifft. 8 AP.
+	Lvl 30: Stolperfalle – Der Gegner stolpert und fällt hin. 9 AP.
+	Lvl 40: Seiltrick – Du fesselst den Gegner kurz mit einem Seil. 12 AP. 
+	Lvl 50: Pfeilhagel – Ein Dutzent kleiner Pfeile fliegt auf deinen Gegner. 13 AP.
+	Lvl 60: Doppeltritt – Zwei schnelle Tritte hintereinander. 2x7 AP.
+	Lvl 70: Wirbelklinge – Du drehst dich und triffst deinen Gegner gleich dreifach mit deiner Klinge. 3x5 AP.
+	Lvl 80: Stinkbombe – Eine stinkende Wolke benebelt deinen Gegner. 17 AP.
+	Lvl 90: Unsichtbare Klinge – Du bewegst dich so geschickt, dass du für deinen Gegner wie unsichtbar bist. 30%ige Chance, dass dein Gegner dich nicht sieht und du direkt ein zweites Mal angreifen kannst. 19 AP.
+
+Benachrichtigungssystem:
+Trigger-Zeiten:
+- Freitag 16:00: "Noch X Münzen bis zum Taschengeld!"
+- Samstag 12:00: Warnung wenn Münzen unter Mindestanforderung
+- Sonntag 18:00: Letzte Chance wenn Münzen unter Mindestanforderung
+
+Hauptbildschirme
+1. NFC-Login Screen: Große Animation mit "Figur auflegen" Anweisung
+2. Home Dashboard: dreigeteilte Ansicht:
+- Anzeige des Charakters mit Avatar, Level, XP, HP, übrige Schritte, Münzen, Edelsteine
+- Fortschrittsleiste bis Erreichen des Taschengeldes
+- Anzeige aller offenen Aufgaben
+3. Spielkarte: Isometrische Kartenansicht mit Pfad
+4. Kampfbildschirm: Animierter Kampf gegen Monster
+5. Charakteranpassung: 3D-Preview mit Anpassungsoptionen
+6. Aufgabenverwaltung (Admin): Liste mit CRUD-Operationen
+7. Statistik-Screen: Wochenübersicht, Münzstand
+8. Bibliothek
+
+Design-Prinzipien
+- Farbschema: 
+--midnight-green: #003844ff;
+--caribbean-current: #006c67ff;
+--amaranth-pink: #f194b4ff;
+--selective-yellow: #ffb100ff;
+--dutch-white: #ffebc6ff;
+- Typografie: Rounded Sans-Serif (z.B. Quicksand)
+- Illustrationsstil: Flat Design mit leichten Schatten
+- Feedback: Haptisches Feedback bei Aktionen
+- Sounds: kurze Erfolgsmelodien
+
+
