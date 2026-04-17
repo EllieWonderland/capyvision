@@ -3,8 +3,8 @@
 > Erledigte Aufgaben werden abgehakt, aber nie gelöscht.
 
 ---
-
-## 🔴 Kritische Bugs (sofort beheben)
+## MCP ##
+### 🔴 Kritische Bugs (sofort beheben)
 
 - [x] **B1** – `types/game.ts`: Schatz-Wegpunkte werden nie erstellt (Bestie-Check greift als erstes, da 24 ein Vielfaches von 6 ist → `else if` wird nie erreicht)
 - [x] **B2** – `contexts/GameContext.tsx`: Steps werden komplett vorab abgezogen, auch wenn der Held nach wenigen Schritten bei einer Bestie stoppt → übrige Schritte gehen verloren
@@ -22,7 +22,7 @@
 
 ---
 
-## 🟠 Hohe Priorität (Kern-Features)
+### 🟠 Hohe Priorität (Kern-Features)
 
 - [x] **F1** – Dungeonmaster-Bereich: PIN-Schutz implementieren (Screen existiert, aber Gate fehlt vollständig)
 - [x] **F2** – Firebase-Integration: Persistenz für User-Daten, Game-State und Tasks (momentan alles flüchtig)
@@ -33,7 +33,7 @@
 
 ---
 
-## 🟡 Mittlere Priorität
+### 🟡 Mittlere Priorität
 
 - [x] **F7** – Helden-Profil Screen: Avatar, Level, Stats, Inventar, Klassen-Angriffe anzeigen
 - [x] **F8** – Shop-System: Münzen/Edelsteine gegen In-Game-Items und Real-Life-Belohnungen tauschen (von Eltern konfigurierbar)
@@ -43,23 +43,25 @@
 
 ---
 
-## 🟢 Niedrige Priorität (Phase 2)
+### 🟢 Niedrige Priorität
 
 - [x] **F12** – Bibliothek: Buch der Bestien, Buch der Klassen, Buch der Welten, Tagebuch
 - [x] **F13** – Tagebuch / Statistik: Monats-/Wochen-Übersicht mit Stickern
-- [ ] **F14** – Push-Benachrichtigungen (Fr 16:00 / Sa 12:00 / So 18:00 Reminder)
+- [x] **F14** – Push-Benachrichtigungen (Fr 16:00 / Sa 12:00 / So 18:00 Reminder)
 - [x] **F15** – Auto-Logout nach Inaktivität (konfigurierbar)
-- [ ] **F16** – Mehrere Welten / Biome mit biom-spezifischen Bestien
-- [ ] **F17** – NFC-Login (Phase 2)
-- [x] **F18** – Animationen & Sound-Effekte (Kampf-Animationen, Erfolgsmelodien)
-- [x] **F19** – Layout-Politur: Responsive Design, Dark Mode, Barrierefreiheit (kontrastreiche Farben, Screen Reader Support)
-- [x] **F20** – TypeScript strict-mode Fehler bereinigen (MOCK_USERS, IconSymbol StyleProp, AuthContext Partial<NonNullable<>>)
+- [x] **F16** – Animationen & Sound-Effekte (Kampf-Animationen, Erfolgsmelodien)
+- [x] **F17** – Layout-Politur: Responsive Design, Dark Mode, Barrierefreiheit (kontrastreiche Farben, Screen Reader Support)
+- [x] **F18** – TypeScript strict-mode Fehler bereinigen (MOCK_USERS, IconSymbol StyleProp, AuthContext Partial<NonNullable<>>)
 
 ---
 
-## 🔒 Sicherheit / Verkaufsreife
+### 🔒 Sicherheit / Verkaufsreife
 
 - [x] **S1** – Firebase API-Key aus Quellcode entfernen, in `.env` auslagern (`.gitignore` prüfen)
 - [x] **S2** – `google-services.json` / `GoogleService-Info.plist` aus Git-History entfernen (sensible Credentials)
 - [x] **S3** – Firestore Security Rules definieren (aktuell vermutlich offene Lese-/Schreibrechte)
 - [x] **S4** – Login-Screen: Nutzer-Liste aus Firestore laden statt aus `MOCK_USERS` (neue Familien sehen sich sonst nicht im Avatar-Selector)
+
+## Phase 2 (Post-MVP)
+- [ ] **F19** – Mehrere Welten / Biome mit biom-spezifischen Bestien
+- [ ] **F20** – NFC-Login (Phase 2)

@@ -7,12 +7,12 @@
 - [x] Farbpalette & Theme integrieren
 - [x] Ordnerstruktur anlegen
 
-## 🔄 Phase 2: Authentifizierung
+## ✅ Phase 2: Authentifizierung
 - [x] Login Screen (Avatar-Auswahl)
 - [x] AuthContext für Session-Management
 - [x] Mock-User-Daten (Papa, Leo, Mia)
-- [ ] PIN-Schutz für Eltern-Bereich ← **fehlt noch (B13)**
-- [ ] Nutzer-Liste aus Firestore laden (statt MOCK_USERS) ← **fehlt noch (S4)**
+- [x] PIN-Schutz für Eltern-Bereich (B13)
+- [x] Nutzer-Liste aus Firestore laden (statt MOCK_USERS) (S4)
 
 ## ✅ Phase 3: Aufgaben-System
 - [x] Task-Typen definieren (easy/medium/hard)
@@ -36,17 +36,17 @@
 - [x] Sieg/Niederlage Logik
 - [x] Münzen/Edelsteine als Belohnung
 
-## 🔄 Phase 6: Charakter & Klassen
-- [ ] Avatar-Designer (Aussehen-Slider, Farbwahl) ← **fehlt noch (F5)**
+## ✅ Phase 6: Charakter & Klassen
+- [x] Avatar-Designer (Aussehen-Slider, Farbwahl) (F5)
 - [x] Klassenwahl (Barbar, Druide, Zauberer, Schurke)
 - [x] Level-System (XP → Level Up)
 - [x] Stats-Berechnung (HP, AP nach Formel)
 
-## 🔄 Phase 7: Shop & Inventar
+## ✅ Phase 7: Shop & Inventar
 - [x] Shop-Screen mit Items
 - [x] Münzen & Edelsteine als Währung
-- [ ] Inventar-System: gekaufte Items anwenden (B12) ← **fehlt noch**
-- [ ] Tränke / Ausrüstung im Kampf nutzen ← **abhängig von Inventar**
+- [x] Inventar-System: gekaufte Items anwenden (B12)
+- [x] Tränke / Ausrüstung im Kampf nutzen
 
 ## ✅ Phase 8: Bibliothek
 - [x] Buch der Bestien
@@ -58,16 +58,16 @@
 - [x] Wöchentliches Münzziel (Mo–So-Zyklus)
 - [x] Sparschwein-Mechanik (50 % Roll-over)
 - [x] Edelstein-Bonus bei vollem Ziel
-- [ ] Auszahlungs-UI (Eltern bestätigen Auszahlung am Wochenende) ← **fehlt noch**
+- [ ] Auszahlungs-UI (Eltern bestätigen Auszahlung am Wochenende) ← **Phase 2**
 
-## 🔲 Phase 10: Polishing & Verkaufsreife
-- [ ] Firebase-Credentials aus Quellcode auslagern (S1–S3)
-- [ ] Benachrichtigungen (Freitag/Samstag/Sonntag) (F14)
-- [ ] Auto-Logout nach Inaktivität (F15)
-- [ ] Sound-Effekte & Kampf-Animationen (F18)
-- [ ] Mehrere Welten / Biome (F16)
-- [ ] NFC-Login (F17)
-- [ ] Responsive Design, Dark Mode, Barrierefreiheit (F19)
+## ✅ Phase 10: Polishing & Verkaufsreife
+- [x] Firebase-Credentials aus Quellcode auslagern (S1–S3)
+- [x] Benachrichtigungen (Freitag/Samstag/Sonntag) (F14)
+- [x] Auto-Logout nach Inaktivität (F15)
+- [x] Sound-Effekte & Haptic Feedback (F18)
+- [x] Responsive Design, Dark Mode, Barrierefreiheit (F19)
+- [ ] Mehrere Welten / Biome (F16) ← Phase 2
+- [ ] NFC-Login (F17) ← Phase 2
 
 ---
 **Legende:** ✅ = Phase abgeschlossen | 🔄 = In Arbeit (teilweise offen) | 🔲 = Noch offen | [x] = Erledigt | [ ] = Ausstehend
