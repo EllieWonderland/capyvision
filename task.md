@@ -28,7 +28,7 @@
 - [x] **F2** – Firebase-Integration: Persistenz für User-Daten, Game-State und Tasks (momentan alles flüchtig)
 - [x] **F3** – Kampfsystem: Rundenbasiert (Pokémon-Stil), HP/AP-Formeln, Sieg → Münzen/Edelsteine, Niederlage → kein XP-Verlust, Held wird zurückgestoßen (GameDesignFeedback beachten!)
 - [x] **F4** – Klassen-System: Barbar / Druide / Zauberer / Schurke mit Boni auf HP, AP, Schritte, Münzen
-- [ ] **F5** – Avatar-Designer: Aussehen-Slider und Farbwahl fehlen (aktuell nur Klassen-Emoji, kein echter Designer)
+- [x] **F5** – Avatar-Designer: Aussehen-Slider und Farbwahl fehlen (aktuell nur Klassen-Emoji, kein echter Designer)
 - [x] **F6** – Wöchentliches Münzsystem: Mo–So-Zyklus, Sparschwein-Mechanik (50% Roll-over bei Nicht-Erreichen), Edelstein-Bonus bei vollem Ziel
 
 ---
@@ -48,11 +48,12 @@
 - [x] **F12** – Bibliothek: Buch der Bestien, Buch der Klassen, Buch der Welten, Tagebuch
 - [x] **F13** – Tagebuch / Statistik: Monats-/Wochen-Übersicht mit Stickern
 - [ ] **F14** – Push-Benachrichtigungen (Fr 16:00 / Sa 12:00 / So 18:00 Reminder)
-- [ ] **F15** – Auto-Logout nach Inaktivität (konfigurierbar)
+- [x] **F15** – Auto-Logout nach Inaktivität (konfigurierbar)
 - [ ] **F16** – Mehrere Welten / Biome mit biom-spezifischen Bestien
 - [ ] **F17** – NFC-Login (Phase 2)
-- [ ] **F18** – Animationen & Sound-Effekte (Kampf-Animationen, Erfolgsmelodien)
-- [ ] **F19** – Layout-Politur: Responsive Design, Dark Mode, Barrierefreiheit (kontrastreiche Farben, Screen Reader Support)
+- [x] **F18** – Animationen & Sound-Effekte (Kampf-Animationen, Erfolgsmelodien)
+- [x] **F19** – Layout-Politur: Responsive Design, Dark Mode, Barrierefreiheit (kontrastreiche Farben, Screen Reader Support)
+- [x] **F20** – TypeScript strict-mode Fehler bereinigen (MOCK_USERS, IconSymbol StyleProp, AuthContext Partial<NonNullable<>>)
 
 ---
 
