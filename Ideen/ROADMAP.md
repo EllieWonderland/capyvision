@@ -58,7 +58,7 @@
 - [x] Wöchentliches Münzziel (Mo–So-Zyklus)
 - [x] Sparschwein-Mechanik (50 % Roll-over)
 - [x] Edelstein-Bonus bei vollem Ziel
-- [ ] Auszahlungs-UI (Eltern bestätigen Auszahlung am Wochenende) ← **Phase 2**
+- [ ] Auszahlungs-UI (Eltern bestätigen Auszahlung am Wochenende)
 
 ## ✅ Phase 10: Polishing & Verkaufsreife
 - [x] Firebase-Credentials aus Quellcode auslagern (S1–S3)
