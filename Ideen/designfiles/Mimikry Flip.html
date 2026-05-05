@@ -1,0 +1,707 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<title>Mimikry — Besen & Bestien</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #1a1a1a; font-family: 'Quicksand', system-ui, sans-serif; }
+  body { display: flex; align-items: center; justify-content: center; overflow: hidden; }
+
+  @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes fadeOut { from { opacity: 1 } to { opacity: 0 } }
+  @keyframes slideUp { from { transform: translateY(100%) } to { transform: translateY(0) } }
+  @keyframes float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-8px) } }
+
+  /* friendly chest shake — small & light, before reveal */
+  @keyframes chestRattle {
+    0%,100%{transform:translate(0,0) rotate(0)}
+    25%{transform:translate(-2px,1px) rotate(-1deg)}
+    50%{transform:translate(2px,-1px) rotate(1deg)}
+    75%{transform:translate(-1px,1px) rotate(-0.5deg)}
+  }
+
+  /* horror shake — violent, after reveal */
+  @keyframes horrorShake {
+    0%,100%{transform:translate(0,0) rotate(0)}
+    10%{transform:translate(-8px,3px) rotate(-3deg)}
+    25%{transform:translate(8px,-3px) rotate(3deg)}
+    40%{transform:translate(-6px,4px) rotate(-2deg)}
+    55%{transform:translate(6px,-4px) rotate(2deg)}
+    70%{transform:translate(-8px,2px) rotate(-3deg)}
+    85%{transform:translate(8px,-2px) rotate(3deg)}
+  }
+
+  @keyframes mimicBreath {
+    0%,100% { transform: scale(1) translateY(0) }
+    50%     { transform: scale(1.04) translateY(-4px) }
+  }
+
+  /* lid hinges open like a hungry mouth */
+  @keyframes mouthOpen {
+    0%   { transform: translate(-50%, 0) rotateX(0deg) }
+    40%  { transform: translate(-50%, -4px) rotateX(-30deg) }
+    100% { transform: translate(-50%, -8px) rotateX(-65deg) }
+  }
+  @keyframes mouthChomp {
+    0%   { transform: translate(-50%, -8px) rotateX(-65deg) }
+    50%  { transform: translate(-50%, 0)    rotateX(-15deg) }
+    100% { transform: translate(-50%, -8px) rotateX(-65deg) }
+  }
+
+  /* pupils appear inside */
+  @keyframes eyeOpen {
+    0%   { opacity: 0; transform: scale(0) }
+    60%  { transform: scale(1.4) }
+    100% { opacity: 1; transform: scale(1) }
+  }
+
+  /* tongue lolls out */
+  @keyframes tongueOut {
+    0%   { opacity: 0; transform: translate(-50%, -10px) scaleY(0) }
+    100% { opacity: 1; transform: translate(-50%, 0) scaleY(1) }
+  }
+
+  /* coins falling out, dripping */
+  @keyframes coinDrip {
+    0%   { transform: translate(-50%, 0) rotate(0); opacity: 1 }
+    100% { transform: translate(-50%, 80px) rotate(540deg); opacity: 0 }
+  }
+
+  /* JUMPSCARE: red flash + zoom */
+  @keyframes scareFlash {
+    0%   { background: rgba(255,0,0,0); }
+    8%   { background: rgba(255,0,0,0.85); }
+    50%  { background: rgba(255,0,0,0.3); }
+    100% { background: rgba(255,0,0,0); }
+  }
+  @keyframes scareZoom {
+    0%   { transform: scale(1) }
+    20%  { transform: scale(1.4) }
+    100% { transform: scale(1) }
+  }
+
+  @keyframes hardShake {
+    0%,100%{transform:translate(0,0)}
+    20%{transform:translate(-12px,4px)}
+    40%{transform:translate(12px,-4px)}
+    60%{transform:translate(-10px,6px)}
+    80%{transform:translate(10px,-6px)}
+  }
+
+  @keyframes scrollStars { from { background-position: 0 0 } to { background-position: 0 80px } }
+
+  @keyframes glitchSlide {
+    0% { transform: translateX(0) }
+    20% { transform: translateX(-3px) }
+    40% { transform: translateX(3px) }
+    60% { transform: translateX(-2px) }
+    80% { transform: translateX(2px) }
+    100% { transform: translateX(0) }
+  }
+
+  @keyframes warningPulse {
+    0%,100% { background: rgba(0,0,0,0); border-color: rgba(255,80,80,0.3) }
+    50%     { background: rgba(255,40,40,0.15); border-color: rgba(255,80,80,1) }
+  }
+
+  @keyframes textGlitch {
+    0%,100% { transform: translate(0,0); color: #feebc6 }
+    20% { transform: translate(-1px,1px); color: #ff6a6a }
+    40% { transform: translate(1px,-1px); color: #6affe9 }
+    60% { transform: translate(-1px,-1px); color: #feebc6 }
+    80% { transform: translate(1px,1px); color: #ff6a6a }
+  }
+</style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script type="text/babel" src="ios-frame.jsx"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    const C = {
+      midnight: '#003844',
+      caribbean: '#006c67',
+      pink: '#f194b4',
+      yellow: '#ffb100',
+      cream: '#feebc6',
+      gold: '#ffd84a',
+      goldDark: '#b07a00',
+      wood: '#7a4a1a',
+      woodDark: '#4c2c0a',
+      woodLight: '#a6702e',
+      mimicWood: '#3a1a08',
+      mimicDark: '#1c0a02',
+      mimicGum: '#7a1820',
+      mimicTongue: '#c9485a',
+      red: '#ff4040',
+    };
+
+    // ──────────────── CHEST BASE ────────────────
+    function ChestBase({ mode }) {
+      // mode: 'treasure' | 'mimic'
+      const isMimic = mode === 'mimic';
+      const wood   = isMimic ? C.mimicWood : C.wood;
+      const dark   = isMimic ? C.mimicDark : C.woodDark;
+      return (
+        <svg width="220" height="130" viewBox="0 0 220 130" style={{
+          filter: 'drop-shadow(0 10px 0 rgba(0,0,0,0.35))',
+          transition: 'filter 400ms',
+        }}>
+          {/* back wall (mouth interior visible when lid open) */}
+          <rect x="22" y="18" width="176" height="70" rx="6"
+                fill={isMimic ? C.mimicGum : '#2a1608'} />
+          {/* gold lining for treasure */}
+          {!isMimic && (
+            <rect x="26" y="22" width="168" height="60" rx="4" fill="url(#goldFill)" />
+          )}
+          {/* gum highlight for mimic */}
+          {isMimic && (
+            <rect x="26" y="22" width="168" height="60" rx="4" fill="url(#gumFill)" />
+          )}
+          {/* front body */}
+          <rect x="18" y="50" width="184" height="64" rx="10" fill={wood} stroke={dark} strokeWidth="3" />
+          <rect x="18" y="50" width="184" height="64" rx="10" fill="url(#plankGrain)" opacity="0.35" />
+          {/* bottom trim */}
+          <rect x="18" y="104" width="184" height="12" rx="4" fill={dark} />
+          {/* iron bands */}
+          <rect x="60" y="50" width="8" height="64" fill={isMimic ? '#0c0a08' : '#2a2a2a'} />
+          <rect x="152" y="50" width="8" height="64" fill={isMimic ? '#0c0a08' : '#2a2a2a'} />
+          {/* studs */}
+          {[64, 156].map(x => (
+            <g key={x}>
+              <circle cx={x+4} cy="60" r="3" fill={isMimic ? '#3a3a3a' : '#888'}/>
+              <circle cx={x+4} cy="80" r="3" fill={isMimic ? '#3a3a3a' : '#888'}/>
+              <circle cx={x+4} cy="100" r="3" fill={isMimic ? '#3a3a3a' : '#888'}/>
+            </g>
+          ))}
+          {/* keyhole plate */}
+          <rect x="100" y="70" width="20" height="26" rx="3" fill={isMimic ? '#1a0a00' : C.goldDark} stroke="#3a2a0a" strokeWidth="1.5"/>
+          <circle cx="110" cy="80" r="3.5" fill="#1a0a00" />
+          <rect x="108.5" y="82" width="3" height="8" fill="#1a0a00" />
+          {/* feet — for mimic, become claws */}
+          {!isMimic && (
+            <>
+              <rect x="18" y="112" width="18" height="10" rx="3" fill={dark}/>
+              <rect x="184" y="112" width="18" height="10" rx="3" fill={dark}/>
+            </>
+          )}
+          {isMimic && (
+            <>
+              {/* clawed feet */}
+              <g fill={dark}>
+                <path d="M14 110 L18 122 L24 116 L26 124 L32 116 L36 124 L40 110 Z"/>
+                <path d="M180 110 L184 124 L190 116 L194 124 L200 116 L204 124 L208 110 Z"/>
+              </g>
+            </>
+          )}
+          {/* TEETH along front lip — only in mimic mode */}
+          {isMimic && (
+            <g>
+              {[28, 48, 68, 88, 108, 128, 148, 168, 188].map((x, i) => (
+                <path key={i} d={`M${x} 50 L${x+6} 50 L${x+3} ${56 + (i%2)*2} Z`}
+                      fill="#fff8e8" stroke="#3a2a0a" strokeWidth="0.8"/>
+              ))}
+            </g>
+          )}
+
+          <defs>
+            <linearGradient id="goldFill" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0" stopColor="#fff3a8"/>
+              <stop offset="0.5" stopColor={C.gold}/>
+              <stop offset="1" stopColor={C.goldDark}/>
+            </linearGradient>
+            <linearGradient id="gumFill" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0" stopColor="#a02838"/>
+              <stop offset="1" stopColor="#3a0a14"/>
+            </linearGradient>
+            <pattern id="plankGrain" x="0" y="0" width="40" height="8" patternUnits="userSpaceOnUse">
+              <line x1="0" y1="4" x2="40" y2="4" stroke={dark} strokeWidth="0.8"/>
+            </pattern>
+          </defs>
+        </svg>
+      );
+    }
+
+    // ──────────────── CHEST LID ────────────────
+    function ChestLid({ mode, openState, chompKey }) {
+      // openState: 'closed' | 'opening' | 'open' | 'chomp'
+      const isMimic = mode === 'mimic';
+      const wood = isMimic ? C.mimicWood : C.woodLight;
+      const dark = isMimic ? C.mimicDark : C.woodDark;
+
+      let anim = 'none';
+      let staticTransform = 'translate(-50%, 0)';
+      if (openState === 'opening') anim = 'mouthOpen 700ms cubic-bezier(.5,1.6,.5,1) forwards';
+      if (openState === 'open')    staticTransform = 'translate(-50%, -8px) rotateX(-65deg)';
+      if (openState === 'chomp')   { anim = `mouthChomp 380ms ease-in-out`; staticTransform = 'translate(-50%, -8px) rotateX(-65deg)'; }
+
+      return (
+        <div key={openState === 'chomp' ? chompKey : openState} style={{
+          position: 'absolute', left: '50%', top: -6,
+          transformOrigin: '50% 100%',
+          animation: anim,
+          transform: staticTransform,
+          willChange: 'transform',
+        }}>
+          <svg width="220" height="70" viewBox="0 0 220 70" style={{
+            filter: 'drop-shadow(0 4px 0 rgba(0,0,0,0.25))',
+          }}>
+            {/* lid body */}
+            <path d="M18 60 Q18 8 110 8 Q202 8 202 60 Z"
+                  fill={wood} stroke={dark} strokeWidth="3"/>
+            <path d="M18 60 Q18 8 110 8 Q202 8 202 60 Z" fill="url(#lidGrain)" opacity="0.3"/>
+            {/* iron bands */}
+            <path d="M60 60 Q60 18 68 14 L68 60 Z" fill={isMimic ? '#0c0a08' : '#2a2a2a'}/>
+            <path d="M152 60 Q152 14 160 18 L160 60 Z" fill={isMimic ? '#0c0a08' : '#2a2a2a'}/>
+            {/* latch */}
+            <rect x="100" y="46" width="20" height="14" rx="2" fill={isMimic ? '#1a0a00' : C.goldDark} stroke="#3a2a0a" strokeWidth="1.2"/>
+            {/* highlight */}
+            <path d="M40 20 Q110 4 180 20" stroke={isMimic ? '#5a2818' : '#d9a25f'} strokeWidth="2" fill="none" opacity="0.7"/>
+            {/* TEETH on the inside-bottom edge of the lid (visible when open) */}
+            {isMimic && (
+              <g>
+                {[28, 48, 68, 88, 108, 128, 148, 168, 188].map((x, i) => (
+                  <path key={i} d={`M${x} 60 L${x+6} 60 L${x+3} ${52 - (i%2)*2} Z`}
+                        fill="#fff8e8" stroke="#3a2a0a" strokeWidth="0.8"/>
+                ))}
+              </g>
+            )}
+            <defs>
+              <pattern id="lidGrain" x="0" y="0" width="40" height="8" patternUnits="userSpaceOnUse">
+                <line x1="0" y1="4" x2="40" y2="4" stroke={dark} strokeWidth="0.8"/>
+              </pattern>
+            </defs>
+          </svg>
+        </div>
+      );
+    }
+
+    // ──────────────── INSIDE ELEMENTS (eyes / tongue) ────────────────
+    function MimicEyes() {
+      return (
+        <div style={{
+          position: 'absolute', left: '50%', top: 38,
+          transform: 'translateX(-50%)',
+          display: 'flex', gap: 22, zIndex: 4,
+          pointerEvents: 'none',
+        }}>
+          {[0,1].map(i => (
+            <div key={i} style={{
+              width: 26, height: 26, borderRadius: '50%',
+              background: 'radial-gradient(circle at 35% 30%, #ffe89a, #ffb100 50%, #ff5500 90%)',
+              boxShadow: `0 0 10px ${C.red}, inset 0 0 6px #5a0808`,
+              animation: `eyeOpen 360ms cubic-bezier(.5,1.7,.5,1) ${i*80}ms backwards, float 2.4s ease-in-out ${600+i*100}ms infinite`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <div style={{
+                width: 6, height: 14, borderRadius: '50%',
+                background: '#0a0000',
+              }}/>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    function MimicTongue() {
+      return (
+        <div style={{
+          position: 'absolute', left: '50%', top: 70, zIndex: 3,
+          width: 56, height: 70,
+          transform: 'translate(-50%, 0)',
+          transformOrigin: '50% 0',
+          animation: 'tongueOut 500ms ease-out forwards',
+          opacity: 0,
+          pointerEvents: 'none',
+        }}>
+          <svg viewBox="0 0 56 70" width="56" height="70">
+            <path d="M28 0 Q14 8 12 38 Q12 62 28 70 Q44 62 44 38 Q42 8 28 0 Z"
+                  fill={C.mimicTongue} stroke="#5a1018" strokeWidth="1.5"/>
+            <path d="M28 8 L28 50" stroke="#5a1018" strokeWidth="1.5"/>
+            <ellipse cx="22" cy="20" rx="4" ry="6" fill="#e87a8a" opacity="0.7"/>
+          </svg>
+        </div>
+      );
+    }
+
+    // ──────────────── COINS DRIPPING (post-reveal) ────────────────
+    function DrippingCoins({ k }) {
+      return (
+        <div key={k} style={{
+          position: 'absolute', left: '50%', top: 60, zIndex: 2, pointerEvents: 'none',
+        }}>
+          {[-30,-10,15,32].map((dx, i) => (
+            <div key={i} style={{
+              position: 'absolute', left: dx, top: 0,
+              width: 22, height: 22,
+              animation: `coinDrip 1100ms ease-in ${i*120}ms forwards`,
+              opacity: 0,
+            }}>
+              <svg viewBox="0 0 28 28" width="22" height="22">
+                <circle cx="14" cy="14" r="12" fill={C.gold} stroke={C.goldDark} strokeWidth="2"/>
+                <text x="14" y="18" textAnchor="middle" fontSize="12" fontWeight="900" fill={C.goldDark}>$</text>
+              </svg>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    // ──────────────── HEADER STRIP ────────────────
+    function Header({ phase, onBack }) {
+      const horror = phase === 'reveal' || phase === 'mimic' || phase === 'transition';
+      const titleProps = horror ? {
+        animation: 'textGlitch 320ms ease-in-out 2',
+      } : {};
+      return (
+        <div style={{
+          position: 'relative', zIndex: 4,
+          padding: '56px 16px 10px',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}>
+          <button onClick={onBack} style={{
+            background: 'rgba(0,0,0,0.3)',
+            border: `1px solid ${horror ? 'rgba(255,80,80,0.5)' : 'rgba(255,235,198,0.3)'}`,
+            color: C.cream, width: 38, height: 38, borderRadius: 19,
+            fontSize: 18, cursor: 'pointer', fontFamily: 'inherit',
+          }}>←</button>
+          <div style={{
+            color: horror ? '#ff6a6a' : C.cream, fontSize: 18, fontWeight: 900, letterSpacing: 2,
+            textShadow: '0 2px 0 rgba(0,0,0,0.4)',
+            ...titleProps,
+          }}>
+            {horror ? '⚠️  MIMIKRY' : '✨ SCHATZ'}
+          </div>
+          <div style={{ width: 38 }}/>
+        </div>
+      );
+    }
+
+    // ──────────────── MAIN ────────────────
+    function MimicScreen() {
+      // phases: idle -> rattle -> reveal -> mimic -> transition
+      const [phase, setPhase] = useState('idle');
+      const [chompK, setChompK] = useState(0);
+      const [scareK, setScareK] = useState(0);
+      const [coinDripK, setCoinDripK] = useState(0);
+
+      const backToMap = () => { window.location.href = 'Wunderwald Map.html'; };
+      const goToBattle = () => { window.location.href = 'Kampf Screen.html'; };
+
+      // Phase progression
+      const startSequence = () => {
+        if (phase !== 'idle') return;
+        setPhase('rattle');
+        // jumpscare reveal
+        setTimeout(() => {
+          setPhase('reveal');
+          setScareK(Date.now());
+        }, 1400);
+        // settle into mimic idle
+        setTimeout(() => {
+          setPhase('mimic');
+          setCoinDripK(Date.now());
+        }, 2600);
+      };
+
+      // Periodic chomp animation while in mimic state
+      useEffect(() => {
+        if (phase !== 'mimic') return;
+        const t1 = setTimeout(() => setChompK(Date.now()), 1200);
+        const t2 = setTimeout(() => setChompK(Date.now()+1), 3200);
+        return () => { clearTimeout(t1); clearTimeout(t2); };
+      }, [phase, chompK]);
+
+      // Reset
+      const replay = () => {
+        setPhase('idle'); setChompK(0); setScareK(0); setCoinDripK(0);
+      };
+
+      // Initiate fight: short outro, then nav
+      const fight = () => {
+        setPhase('transition');
+        setTimeout(goToBattle, 700);
+      };
+
+      const isMimic = phase === 'reveal' || phase === 'mimic' || phase === 'transition';
+      const lidState =
+        phase === 'idle'    ? 'closed' :
+        phase === 'rattle'  ? 'closed' :
+        phase === 'reveal'  ? 'opening' :
+        phase === 'mimic'   ? (chompK ? 'chomp' : 'open') :
+        phase === 'transition' ? 'open' : 'closed';
+
+      const chestAnim =
+        phase === 'rattle' ? 'chestRattle 1.4s ease-in-out infinite' :
+        phase === 'reveal' ? 'horrorShake 600ms ease-out' :
+        phase === 'mimic'  ? 'mimicBreath 2.6s ease-in-out infinite' :
+        phase === 'transition' ? 'horrorShake 700ms ease-in-out' :
+        'float 3s ease-in-out infinite';
+
+      return (
+        <div data-screen-label="05 Mimikry-Flip" style={{
+          position: 'relative', width: '100%', height: '100%', overflow: 'hidden',
+          background: isMimic
+            ? `radial-gradient(ellipse at 50% 40%, #4a0a14 0%, #1a0408 55%, #060002 100%)`
+            : `radial-gradient(ellipse at 50% 40%, #1f5b58 0%, #003844 55%, #001a20 100%)`,
+          transition: 'background 600ms ease',
+        }}>
+          {/* stars / motes */}
+          <div style={{
+            position: 'absolute', inset: 0, opacity: isMimic ? 0.18 : 0.32, zIndex: 0,
+            background: `
+              radial-gradient(circle at 20% 30%, ${isMimic ? '#ff8888' : C.cream} 1px, transparent 2px),
+              radial-gradient(circle at 80% 60%, ${isMimic ? '#ff8888' : C.cream} 1px, transparent 2px),
+              radial-gradient(circle at 40% 80%, ${isMimic ? '#ff8888' : C.cream} 1px, transparent 2px),
+              radial-gradient(circle at 65% 20%, ${isMimic ? '#ff8888' : C.cream} 1px, transparent 2px)
+            `,
+            backgroundSize: '120px 120px, 160px 160px, 200px 200px, 140px 140px',
+            animation: 'scrollStars 14s linear infinite',
+          }}/>
+
+          <Header phase={phase} onBack={backToMap}/>
+
+          {/* Headline */}
+          <div style={{
+            position: 'relative', zIndex: 2,
+            textAlign: 'center', color: C.cream,
+            marginTop: 6, marginBottom: 8, padding: '0 24px',
+            minHeight: 56,
+          }}>
+            {phase === 'idle' && (
+              <>
+                <div style={{ fontSize: 13, fontWeight: 700, opacity: 0.7, letterSpacing: 2 }}>
+                  DU FINDEST EINE TRUHE
+                </div>
+                <div style={{ fontSize: 22, fontWeight: 900, marginTop: 4 }}>
+                  Verlockend… aber irgendwas stimmt nicht.
+                </div>
+              </>
+            )}
+            {phase === 'rattle' && (
+              <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: 1 }}>
+                Sie wackelt von alleine…
+              </div>
+            )}
+            {phase === 'reveal' && (
+              <div style={{
+                fontSize: 30, fontWeight: 900, color: '#ff5050',
+                textShadow: '0 0 16px #ff404088',
+                animation: 'textGlitch 200ms ease-in-out 3',
+              }}>
+                EINE FALLE!
+              </div>
+            )}
+            {phase === 'mimic' && (
+              <>
+                <div style={{
+                  fontSize: 12, fontWeight: 800, letterSpacing: 3, color: '#ff8a8a',
+                }}>MIMIKRY · WALD-MIMIC</div>
+                <div style={{ fontSize: 20, fontWeight: 900, marginTop: 4, color: C.cream }}>
+                  Das war kein Schatz.
+                </div>
+              </>
+            )}
+            {phase === 'transition' && (
+              <div style={{ fontSize: 22, fontWeight: 900, color: '#ff8a8a' }}>
+                ⚔️ KAMPF…
+              </div>
+            )}
+          </div>
+
+          {/* Stage */}
+          <div style={{
+            position: 'relative', zIndex: 2,
+            height: 280, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            marginTop: 4,
+          }}>
+            {/* shadow */}
+            <div style={{
+              position: 'absolute', bottom: 34, left: '50%',
+              transform: 'translateX(-50%)',
+              width: 200, height: 28, borderRadius: '50%',
+              background: 'radial-gradient(ellipse, rgba(0,0,0,0.55), transparent 70%)',
+              zIndex: 0,
+            }}/>
+
+            {/* Chest */}
+            <div style={{
+              position: 'relative', width: 240, height: 220,
+              animation: chestAnim,
+              display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+            }}>
+              <div style={{ position: 'relative' }}>
+                <ChestBase mode={isMimic ? 'mimic' : 'treasure'}/>
+                <ChestLid mode={isMimic ? 'mimic' : 'treasure'} openState={lidState} chompKey={chompK}/>
+
+                {/* Eyes inside */}
+                {(phase === 'reveal' || phase === 'mimic' || phase === 'transition') && <MimicEyes/>}
+
+                {/* Tongue once mimic */}
+                {(phase === 'mimic' || phase === 'transition') && <MimicTongue/>}
+
+                {/* Dripping coins */}
+                {coinDripK ? <DrippingCoins k={coinDripK}/> : null}
+              </div>
+            </div>
+          </div>
+
+          {/* Action panel */}
+          <div style={{
+            position: 'absolute', left: 14, right: 14, bottom: 24, zIndex: 4,
+          }}>
+            {phase === 'idle' && (
+              <div style={{
+                background: C.cream, borderRadius: 22, padding: 16,
+                boxShadow: '0 10px 30px rgba(0,0,0,0.4), 0 6px 0 rgba(0,0,0,0.15)',
+                border: '2px solid rgba(0,0,0,0.08)',
+                animation: 'fadeIn 200ms ease-out',
+              }}>
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  background: 'rgba(255,80,80,0.08)', border: '1px dashed rgba(255,80,80,0.4)',
+                  borderRadius: 12, padding: '8px 12px', marginBottom: 12,
+                  fontSize: 12, color: C.midnight,
+                }}>
+                  <span style={{ fontSize: 18 }}>⚠️</span>
+                  <span><strong>Verdächtig glänzend.</strong> Eine Truhe an einem so abgelegenen Pfad?</span>
+                </div>
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <button onClick={backToMap} style={{
+                    flex: 1, padding: '12px', borderRadius: 14, border: 'none',
+                    background: 'white', color: C.midnight, fontWeight: 800, fontSize: 14,
+                    fontFamily: 'inherit', cursor: 'pointer', boxShadow: '0 4px 0 #c8b98a',
+                  }}>Zurückweichen</button>
+                  <button onClick={startSequence} style={{
+                    flex: 1, padding: '12px', borderRadius: 14, border: 'none',
+                    background: C.yellow, color: C.midnight, fontWeight: 900, fontSize: 14,
+                    fontFamily: 'inherit', cursor: 'pointer', boxShadow: '0 4px 0 #b07a00',
+                    letterSpacing: 0.5,
+                  }}>Truhe öffnen</button>
+                </div>
+              </div>
+            )}
+
+            {phase === 'rattle' && (
+              <div style={{
+                background: 'rgba(0,0,0,0.7)', borderRadius: 16, padding: 14,
+                color: C.cream, fontSize: 13, textAlign: 'center',
+                animation: 'warningPulse 800ms ease-in-out infinite, fadeIn 200ms ease-out',
+                border: '2px solid rgba(255,80,80,0.5)',
+                fontWeight: 700,
+              }}>
+                Etwas bewegt sich da drin…
+              </div>
+            )}
+
+            {(phase === 'mimic' || phase === 'transition') && (
+              <div style={{
+                background: '#1a0408', borderRadius: 22, padding: 14,
+                boxShadow: '0 10px 30px rgba(255,40,40,0.3), 0 6px 0 rgba(0,0,0,0.4)',
+                border: '2px solid rgba(255,80,80,0.5)',
+                animation: 'fadeIn 300ms ease-out',
+              }}>
+                {/* Mimic stat row */}
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 12,
+                  background: 'rgba(255,255,255,0.05)', borderRadius: 12,
+                  padding: '8px 12px', marginBottom: 12,
+                }}>
+                  <div style={{
+                    width: 44, height: 44, borderRadius: 12,
+                    background: 'linear-gradient(135deg, #4a0a14, #1a0408)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 24,
+                    boxShadow: 'inset 0 0 8px #ff404044, 0 3px 0 rgba(0,0,0,0.5)',
+                  }}>📦</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#ff8a8a', letterSpacing: 1 }}>
+                      WALD-MIMIC
+                    </div>
+                    <div style={{ display: 'flex', gap: 12, fontSize: 12, color: C.cream, fontWeight: 700, marginTop: 2 }}>
+                      <span>LP <strong style={{ color: '#ff6a6a' }}>14</strong></span>
+                      <span>AP <strong style={{ color: '#ff6a6a' }}>9</strong></span>
+                      <span>🪙 <strong style={{ color: C.yellow }}>+12</strong></span>
+                    </div>
+                  </div>
+                  <div style={{
+                    background: '#ffc9d6', color: '#a83961',
+                    fontSize: 10, fontWeight: 900, padding: '3px 8px',
+                    borderRadius: 8, letterSpacing: 1,
+                  }}>HARD</div>
+                </div>
+
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <button onClick={backToMap} style={{
+                    flex: 1, padding: '12px', borderRadius: 14, border: 'none',
+                    background: 'rgba(255,255,255,0.1)', color: C.cream, fontWeight: 800, fontSize: 14,
+                    fontFamily: 'inherit', cursor: 'pointer',
+                    boxShadow: '0 4px 0 rgba(0,0,0,0.5)',
+                    border: '1px solid rgba(255,235,198,0.2)',
+                  }}>🏃 Fliehen</button>
+                  <button onClick={fight} style={{
+                    flex: 1.4, padding: '12px', borderRadius: 14, border: 'none',
+                    background: 'linear-gradient(180deg, #ff4040, #c01818)',
+                    color: 'white', fontWeight: 900, fontSize: 14,
+                    fontFamily: 'inherit', cursor: 'pointer', letterSpacing: 1,
+                    boxShadow: '0 5px 0 #5a1010, 0 0 14px rgba(255,80,80,0.5)',
+                    animation: 'warningPulse 1.4s ease-in-out infinite',
+                  }}>⚔️ ANGREIFEN</button>
+                </div>
+              </div>
+            )}
+
+            {/* Replay icon for the demo */}
+            {(phase === 'mimic' || phase === 'reveal' || phase === 'rattle') && (
+              <button onClick={replay} title="Demo neu starten" style={{
+                position: 'absolute', top: -50, right: 0,
+                background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,235,198,0.3)',
+                color: C.cream, width: 36, height: 36, borderRadius: 18,
+                fontSize: 16, cursor: 'pointer', fontFamily: 'inherit',
+              }}>↻</button>
+            )}
+          </div>
+
+          {/* JUMPSCARE: red flash */}
+          {scareK ? (
+            <div key={scareK} style={{
+              position: 'absolute', inset: 0, zIndex: 50, pointerEvents: 'none',
+              animation: 'scareFlash 800ms ease-out forwards',
+            }}/>
+          ) : null}
+
+          {/* Transition fade-out */}
+          {phase === 'transition' && (
+            <div style={{
+              position: 'absolute', inset: 0, zIndex: 60, pointerEvents: 'none',
+              background: 'black',
+              animation: 'fadeIn 700ms ease-in forwards',
+              opacity: 0,
+            }}/>
+          )}
+        </div>
+      );
+    }
+
+    function Root() {
+      return (
+        <IOSDevice dark={true}>
+          <MimicScreen/>
+        </IOSDevice>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<Root/>);
+  </script>
+</body>
+</html>

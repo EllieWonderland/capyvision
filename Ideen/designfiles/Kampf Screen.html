@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<title>Kampf — Besen & Bestien</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #1a1a1a; font-family: 'Quicksand', system-ui, sans-serif; }
+  body { display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes slideUp { from { transform: translateY(100%) } to { transform: translateY(0) } }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-6px)} 80%{transform:translateX(6px)} }
+  @keyframes flash { 0%,100%{filter:brightness(1)} 50%{filter:brightness(1.8) saturate(2)} }
+  @keyframes floatUp {
+    0% { transform: translate(-50%, 0); opacity: 1 }
+    100% { transform: translate(-50%, -60px); opacity: 0 }
+  }
+  @keyframes bob { 0%,100%{ transform: translateY(0) } 50% { transform: translateY(-6px) } }
+  @keyframes pulseGlow {
+    0%,100% { box-shadow: 0 0 0 0 rgba(255,177,0,0.7), 0 6px 0 #b07a00 }
+    50%     { box-shadow: 0 0 0 12px rgba(255,177,0,0), 0 6px 0 #b07a00 }
+  }
+  @keyframes scrollBattleBg {
+    from { background-position: 0 0 }
+    to { background-position: 0 60px }
+  }
+</style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script type="text/babel" src="ios-frame.jsx"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useMemo } = React;
+
+    // Shared palette
+    const C = {
+      midnight: '#003844',
+      caribbean: '#006c67',
+      pink: '#f194b4',
+      yellow: '#ffb100',
+      cream: '#feebc6',
+    };
+
+    // Small helpers
+    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+    // Monster catalog (emoji stand-ins)
+    const MONSTERS = {
+      'Wolf':       { emoji: '🐺', tint: '#6e6e6e' },
+      'Bär':        { emoji: '🐻', tint: '#7a4a2a' },
+      'Fledermaus': { emoji: '🦇', tint: '#4a2a6a' },
+      'Spinne':     { emoji: '🕷️', tint: '#2a2a2a' },
+      'Käfer':      { emoji: '🪲', tint: '#3a6a3a' },
+      'Giftkröte':  { emoji: '🐸', tint: '#4caf50' },
+      'Raupe':      { emoji: '🐛', tint: '#6a9a2a' },
+      'Falke':      { emoji: '🦅', tint: '#7a5a3a' },
+    };
+
+    // ────────── HP BAR ──────────
+    function HPBar({ cur, max, color }) {
+      const pct = clamp(cur / max, 0, 1);
+      const barColor = pct > 0.5 ? color : pct > 0.25 ? C.yellow : '#e24c4c';
+      return (
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, fontWeight: 700, color: C.midnight, marginBottom: 4 }}>
+            <span>LP</span>
+            <span style={{ color: pct <= 0.25 ? '#c44' : C.midnight }}>{cur} / {max}</span>
+          </div>
+          <div style={{
+            height: 16, borderRadius: 10, background: 'rgba(0,0,0,0.18)',
+            overflow: 'hidden', position: 'relative',
+            boxShadow: 'inset 0 2px 3px rgba(0,0,0,0.25)',
+          }}>
+            <div style={{
+              width: `${pct * 100}%`, height: '100%',
+              background: `linear-gradient(to bottom, ${barColor}, ${barColor}cc)`,
+              borderRadius: 10, transition: 'width 450ms cubic-bezier(.2,.8,.2,1)',
+              boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.35)',
+            }} />
+          </div>
+        </div>
+      );
+    }
+
+    // ────────── STAT PILL ──────────
+    function StatPill({ label, value, color }) {
+      return (
+        <div style={{
+          background: 'white', borderRadius: 10, padding: '4px 10px',
+          display: 'flex', alignItems: 'center', gap: 6,
+          boxShadow: '0 2px 0 rgba(0,0,0,0.08)',
+        }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#888' }}>{label}</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color }}>{value}</span>
+        </div>
+      );
+    }
+
+    // ────────── COMBATANT CARD ──────────
+    function Combatant({ who, name, level, meta, hp, maxHp, ap, emoji, tint,
+                         facing, active, hurt, attacking, floatText }) {
+      // facing: 'down' (monster, top) | 'up' (hero, bottom)
+      const animStyle = {
+        animation: hurt ? 'shake 350ms ease' : attacking ? 'flash 300ms ease' : active ? 'bob 1.6s ease-in-out infinite' : 'none',
+      };
+      const barColor = who === 'monster' ? C.pink : C.caribbean;
+      return (
+        <div style={{
+          background: `${C.cream}f2`, borderRadius: 20, padding: 14,
+          boxShadow: '0 6px 0 rgba(0,0,0,0.18), 0 10px 24px rgba(0,0,0,0.15)',
+          border: '2px solid rgba(0,0,0,0.08)',
+          position: 'relative',
+        }}>
+          {/* Header */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+            <div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: C.midnight }}>{name}</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#6b6b6b', marginTop: 2 }}>
+                {meta}
+              </div>
+            </div>
+            <StatPill label="AP" value={ap} color={who === 'monster' ? C.pink : C.caribbean} />
+          </div>
+
+          {/* Arena slot */}
+          <div style={{
+            position: 'relative', height: 120, display: 'flex',
+            alignItems: 'center', justifyContent: 'center', margin: '6px 0 12px',
+          }}>
+            {/* Floor shadow */}
+            <div style={{
+              position: 'absolute', bottom: 4, width: 120, height: 18,
+              borderRadius: '50%',
+              background: 'radial-gradient(ellipse, rgba(0,0,0,0.45), rgba(0,0,0,0) 70%)',
+            }} />
+            {/* Back-ring behind sprite */}
+            <div style={{
+              position: 'absolute', width: 130, height: 70, bottom: 12,
+              borderRadius: '50%',
+              background: `radial-gradient(ellipse, ${tint}44, transparent 70%)`,
+            }} />
+            {/* Sprite */}
+            <div style={{ ...animStyle, fontSize: 92, lineHeight: 1, position: 'relative', filter: 'drop-shadow(0 4px 4px rgba(0,0,0,0.3))' }}>
+              {emoji}
+            </div>
+            {/* Float text */}
+            {floatText && (
+              <div key={floatText.k} style={{
+                position: 'absolute', top: 4, left: '50%',
+                animation: 'floatUp 900ms ease-out forwards',
+                fontSize: 28, fontWeight: 900,
+                color: floatText.color, WebkitTextStroke: `1px ${C.midnight}`,
+                textShadow: '0 2px 0 rgba(0,0,0,0.3)',
+                pointerEvents: 'none',
+              }}>
+                {floatText.text}
+              </div>
+            )}
+            {/* Turn indicator */}
+            {active && (
+              <div style={{
+                position: 'absolute', top: -4, right: 6,
+                background: C.yellow, color: C.midnight,
+                fontSize: 10, fontWeight: 800, padding: '3px 8px',
+                borderRadius: 10, boxShadow: '0 2px 0 #b07a00',
+              }}>AM ZUG</div>
+            )}
+          </div>
+
+          {/* HP */}
+          <HPBar cur={hp} max={maxHp} color={barColor} />
+        </div>
+      );
+    }
+
+    // ────────── BATTLE LOG ──────────
+    function BattleLog({ entries, isHeroTurn, ended }) {
+      const last = entries.slice(-3);
+      return (
+        <div style={{
+          background: 'rgba(0,20,28,0.85)', borderRadius: 14,
+          padding: '10px 12px', color: C.cream, fontSize: 13,
+          lineHeight: 1.5, minHeight: 72,
+          border: `1px solid rgba(255,235,198,0.2)`,
+          boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.4)',
+        }}>
+          {!ended && (
+            <div style={{
+              fontSize: 11, fontWeight: 800, letterSpacing: 0.5, marginBottom: 6,
+              color: isHeroTurn ? '#6be289' : '#ff8a8a',
+            }}>
+              {isHeroTurn ? '⚔️  DEIN ZUG' : '🔴 GEGNER'}
+            </div>
+          )}
+          {last.length === 0 ? (
+            <div style={{ opacity: 0.6 }}>Wähle einen Angriff…</div>
+          ) : (
+            last.map((e, i) => (
+              <div key={entries.length - last.length + i} style={{
+                opacity: 0.5 + 0.25 * i,
+                fontWeight: i === last.length - 1 ? 700 : 500,
+              }}>{e}</div>
+            ))
+          )}
+        </div>
+      );
+    }
+
+    // ────────── ATTACK BUTTON ──────────
+    function AttackButton({ title, subtitle, icon, color, disabled, onClick, highlight }) {
+      return (
+        <button
+          disabled={disabled}
+          onClick={onClick}
+          style={{
+            flex: 1, padding: '10px 12px', borderRadius: 14,
+            border: 'none', textAlign: 'left',
+            background: disabled ? '#4f5a60' : color,
+            color: disabled ? '#aab0b4' : 'white',
+            fontFamily: 'inherit', cursor: disabled ? 'not-allowed' : 'pointer',
+            boxShadow: disabled ? 'none' : `0 5px 0 rgba(0,0,0,0.3)`,
+            transform: 'translateY(0)',
+            transition: 'transform 80ms',
+            display: 'flex', gap: 10, alignItems: 'center',
+            animation: highlight && !disabled ? 'pulseGlow 1.4s ease-in-out infinite' : 'none',
+          }}
+          onMouseDown={e => !disabled && (e.currentTarget.style.transform = 'translateY(2px)')}
+          onMouseUp={e => !disabled && (e.currentTarget.style.transform = 'translateY(0)')}
+        >
+          <span style={{ fontSize: 26 }}>{icon}</span>
+          <span style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 14, fontWeight: 800 }}>{title}</div>
+            <div style={{ fontSize: 11, fontWeight: 600, opacity: 0.85 }}>{subtitle}</div>
+          </span>
+        </button>
+      );
+    }
+
+    // ────────── END DIALOG ──────────
+    function EndDialog({ victory, monsterName, loot, onBack, onRetry }) {
+      return (
+        <>
+          <div style={{
+            position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)',
+            zIndex: 40, animation: 'fadeIn 160ms ease-out',
+          }} onClick={onBack} />
+          <div style={{
+            position: 'absolute', left: 16, right: 16, top: '50%',
+            transform: 'translateY(-50%)', zIndex: 41,
+            background: C.cream, borderRadius: 24, padding: 24,
+            color: C.midnight, textAlign: 'center',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.45)',
+            animation: 'slideUp 260ms cubic-bezier(.2,.8,.2,1)',
+          }}>
+            <div style={{ fontSize: 64, marginBottom: 8 }}>
+              {victory ? '🏆' : '💀'}
+            </div>
+            <div style={{ fontSize: 26, fontWeight: 900, letterSpacing: 1, marginBottom: 6 }}>
+              {victory ? 'SIEG!' : 'NIEDERLAGE'}
+            </div>
+            <div style={{ fontSize: 14, opacity: 0.8, marginBottom: 16 }}>
+              {victory
+                ? `Du hast ${monsterName} besiegt!`
+                : `${monsterName} war zu stark…`}
+            </div>
+            {victory && (
+              <div style={{
+                background: C.yellow, color: C.midnight, borderRadius: 14,
+                padding: '10px 14px', fontSize: 16, fontWeight: 800,
+                marginBottom: 18, display: 'inline-flex', gap: 8, alignItems: 'center',
+                boxShadow: '0 3px 0 #b07a00',
+              }}>
+                <span>🪙</span> +{loot} Münzen
+              </div>
+            )}
+            {!victory && (
+              <div style={{
+                background: 'white', borderRadius: 14, padding: '10px 12px',
+                fontSize: 12, marginBottom: 18, textAlign: 'left',
+              }}>
+                <div style={{ fontWeight: 700 }}>Keine Sorge:</div>
+                <div style={{ opacity: 0.8 }}>
+                  Deine übrigen Schritte bleiben erhalten. Erledige Aufgaben, um stärker zu werden, und versuche es nochmal!
+                </div>
+              </div>
+            )}
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={onRetry} style={{
+                flex: 1, padding: '12px', borderRadius: 14, border: 'none',
+                background: 'white', color: C.midnight, fontWeight: 800, fontSize: 15,
+                fontFamily: 'inherit', cursor: 'pointer', boxShadow: '0 4px 0 #c8b98a',
+              }}>Nochmal</button>
+              <button onClick={onBack} style={{
+                flex: 1, padding: '12px', borderRadius: 14, border: 'none',
+                background: C.caribbean, color: 'white', fontWeight: 800, fontSize: 15,
+                fontFamily: 'inherit', cursor: 'pointer', boxShadow: '0 4px 0 #00413e',
+              }}>Zur Karte</button>
+            </div>
+          </div>
+        </>
+      );
+    }
+
+    // ────────── BATTLE ARENA BG ──────────
+    function ArenaBackground() {
+      return (
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 0,
+          background: `
+            radial-gradient(ellipse at 50% 35%, rgba(255,235,198,0.12), transparent 60%),
+            linear-gradient(to bottom, ${C.caribbean} 0%, ${C.midnight} 70%, #00222b 100%)
+          `,
+        }}>
+          {/* animated sparkles */}
+          <div style={{
+            position: 'absolute', inset: 0, opacity: 0.25,
+            background: `
+              radial-gradient(circle at 20% 30%, #feebc6 1px, transparent 2px),
+              radial-gradient(circle at 80% 60%, #feebc6 1px, transparent 2px),
+              radial-gradient(circle at 40% 80%, #feebc6 1px, transparent 2px),
+              radial-gradient(circle at 65% 20%, #feebc6 1px, transparent 2px),
+              radial-gradient(circle at 15% 70%, #feebc6 1px, transparent 2px)
+            `,
+            backgroundSize: '120px 120px, 160px 160px, 200px 200px, 140px 140px, 180px 180px',
+            animation: 'scrollBattleBg 12s linear infinite',
+          }} />
+          {/* ground line between the two combatants */}
+          <div style={{
+            position: 'absolute', left: 0, right: 0, top: '50%',
+            height: 2, background: 'rgba(255,235,198,0.2)',
+            boxShadow: '0 0 20px rgba(255,235,198,0.2)',
+          }} />
+        </div>
+      );
+    }
+
+    // ────────── MAIN BATTLE SCREEN ──────────
+    function BattleScreen() {
+      // Hero stats
+      const HERO = { name: 'Ritter Finn', level: 3, hp: 22, maxHp: 22, ap: 7, klasse: 'Barbar' };
+
+      // Monster stats (pulled from map or random) — Wolf default
+      const [monsterName] = useState('Wolf');
+      const m0 = MONSTERS[monsterName];
+      const MONSTER = { name: monsterName, difficulty: 'MEDIUM', hp: 24, maxHp: 24, ap: 6, loot: 10, ...m0 };
+
+      const [heroHp, setHeroHp] = useState(HERO.hp);
+      const [monsterHp, setMonsterHp] = useState(MONSTER.hp);
+      const [heroTurn, setHeroTurn] = useState(true);
+      const [log, setLog] = useState([`Ein wilder ${monsterName} stellt sich dir in den Weg!`]);
+      const [ended, setEnded] = useState(null); // null | 'win' | 'lose'
+      const [heroFx, setHeroFx] = useState({});   // { hurt, attacking, floatText }
+      const [monFx, setMonFx] = useState({});
+
+      const busyRef = useRef(false);
+
+      // Cycle: when it's not hero's turn, monster attacks after delay
+      useEffect(() => {
+        if (ended) return;
+        if (heroTurn) return;
+        busyRef.current = true;
+        const t1 = setTimeout(() => {
+          // attack anim
+          setMonFx({ attacking: true });
+          setTimeout(() => setMonFx({}), 320);
+        }, 600);
+        const t2 = setTimeout(() => {
+          const dmg = MONSTER.ap;
+          setHeroHp(h => {
+            const nh = Math.max(0, h - dmg);
+            if (nh <= 0) {
+              setLog(l => [...l, `${MONSTER.name} greift an! ${dmg} Schaden.`,
+                `Du wurdest besiegt! ${MONSTER.name} flieht mit einem bösen Lachen…`]);
+              setEnded('lose');
+            } else {
+              setLog(l => [...l, `${MONSTER.name} greift an! ${dmg} Schaden.`]);
+            }
+            return nh;
+          });
+          setHeroFx({ hurt: true, floatText: { k: Date.now(), text: `-${dmg}`, color: '#ff6a6a' } });
+          setTimeout(() => setHeroFx({}), 800);
+        }, 900);
+        const t3 = setTimeout(() => {
+          if (!ended) setHeroTurn(true);
+          busyRef.current = false;
+        }, 1500);
+        return () => [t1, t2, t3].forEach(clearTimeout);
+      }, [heroTurn, ended]);
+
+      const doAttack = (dmg, label) => {
+        if (!heroTurn || ended || busyRef.current) return;
+        busyRef.current = true;
+        setHeroFx({ attacking: true });
+        setTimeout(() => setHeroFx({}), 320);
+        setTimeout(() => {
+          setMonsterHp(m => {
+            const nm = Math.max(0, m - dmg);
+            if (nm <= 0) {
+              setLog(l => [...l, `${HERO.name} nutzt ${label}! ${dmg} Schaden.`,
+                `${MONSTER.name} wurde besiegt! +${MONSTER.loot} Münzen.`]);
+              setEnded('win');
+            } else {
+              setLog(l => [...l, `${HERO.name} nutzt ${label}! ${dmg} Schaden.`]);
+            }
+            return nm;
+          });
+          setMonFx({ hurt: true, floatText: { k: Date.now(), text: `-${dmg}`, color: C.yellow } });
+          setTimeout(() => setMonFx({}), 800);
+          setTimeout(() => {
+            if (!ended) setHeroTurn(false);
+            busyRef.current = false;
+          }, 800);
+        }, 300);
+      };
+
+      const reset = () => {
+        setHeroHp(HERO.hp); setMonsterHp(MONSTER.hp);
+        setHeroTurn(true); setEnded(null);
+        setLog([`Ein wilder ${monsterName} stellt sich dir in den Weg!`]);
+        setHeroFx({}); setMonFx({});
+        busyRef.current = false;
+      };
+
+      const backToMap = () => { window.location.href = 'Wunderwald Map.html'; };
+
+      return (
+        <div data-screen-label="02 Kampf" style={{
+          position: 'relative', width: '100%', height: '100%',
+          overflow: 'hidden',
+        }}>
+          <ArenaBackground />
+
+          {/* top bar */}
+          <div style={{
+            position: 'relative', zIndex: 2, paddingTop: 56,
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '56px 16px 10px',
+          }}>
+            <button onClick={backToMap} style={{
+              background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,235,198,0.3)',
+              color: C.cream, width: 38, height: 38, borderRadius: 19,
+              fontSize: 18, cursor: 'pointer', fontFamily: 'inherit',
+            }}>←</button>
+            <div style={{
+              color: C.cream, fontSize: 18, fontWeight: 900, letterSpacing: 2,
+              textShadow: '0 2px 0 rgba(0,0,0,0.4)',
+            }}>⚔️ KAMPF</div>
+            <div style={{ width: 38 }} />
+          </div>
+
+          {/* combat area */}
+          <div style={{
+            position: 'relative', zIndex: 2,
+            padding: '6px 14px', display: 'flex', flexDirection: 'column', gap: 10,
+          }}>
+            <Combatant who="monster"
+              name={MONSTER.name} level={null}
+              meta={<>
+                <span style={{
+                  display: 'inline-block', padding: '1px 8px', borderRadius: 8,
+                  background: MONSTER.difficulty === 'EASY' ? '#c8f0cc' :
+                              MONSTER.difficulty === 'MEDIUM' ? '#ffe4a8' :
+                              MONSTER.difficulty === 'HARD' ? '#ffc9d6' : '#e9ccff',
+                  color: MONSTER.difficulty === 'EASY' ? '#2e7d32' :
+                         MONSTER.difficulty === 'MEDIUM' ? '#8a5b00' :
+                         MONSTER.difficulty === 'HARD' ? '#a83961' : '#6a2a9a',
+                  fontWeight: 800, fontSize: 10,
+                }}>{MONSTER.difficulty}</span>
+                <span style={{ marginLeft: 8 }}>Wild</span>
+              </>}
+              hp={monsterHp} maxHp={MONSTER.maxHp} ap={MONSTER.ap}
+              emoji={MONSTER.emoji} tint={MONSTER.tint}
+              active={!heroTurn && !ended}
+              hurt={monFx.hurt} attacking={monFx.attacking}
+              floatText={monFx.floatText}
+            />
+
+            <BattleLog entries={log} isHeroTurn={heroTurn} ended={!!ended} />
+
+            <Combatant who="hero"
+              name={HERO.name} level={HERO.level}
+              meta={`Lvl ${HERO.level} · ${HERO.klasse}`}
+              hp={heroHp} maxHp={HERO.maxHp} ap={HERO.ap}
+              emoji="🛡️" tint={C.yellow}
+              active={heroTurn && !ended}
+              hurt={heroFx.hurt} attacking={heroFx.attacking}
+              floatText={heroFx.floatText}
+            />
+          </div>
+
+          {/* attack dock */}
+          <div style={{
+            position: 'absolute', left: 0, right: 0, bottom: 24,
+            padding: '12px 14px 0',
+            zIndex: 3,
+          }}>
+            <div style={{ display: 'flex', gap: 10, marginBottom: 10 }}>
+              <AttackButton
+                title="Hammerschlag"
+                subtitle={`7 AP · Standard`}
+                icon="🔨"
+                color={C.yellow}
+                disabled={!heroTurn || !!ended}
+                highlight={heroTurn && !ended}
+                onClick={() => doAttack(HERO.ap, 'Hammerschlag')}
+              />
+              <AttackButton
+                title="Brüller"
+                subtitle="Lvl 10 — gesperrt"
+                icon="💢"
+                color={C.pink}
+                disabled
+              />
+            </div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <AttackButton
+                title="Tasche"
+                subtitle="Heiltrank (1)"
+                icon="🎒"
+                color={C.caribbean}
+                disabled={!heroTurn || !!ended}
+                onClick={() => {
+                  if (!heroTurn || ended || busyRef.current) return;
+                  busyRef.current = true;
+                  const heal = 10;
+                  setHeroHp(h => Math.min(HERO.maxHp, h + heal));
+                  setHeroFx({ floatText: { k: Date.now(), text: `+${heal}`, color: '#6be289' } });
+                  setLog(l => [...l, `${HERO.name} trinkt einen Heiltrank. +${heal} LP.`]);
+                  setTimeout(() => setHeroFx({}), 800);
+                  setTimeout(() => { setHeroTurn(false); busyRef.current = false; }, 900);
+                }}
+              />
+              <AttackButton
+                title="Fliehen"
+                subtitle="Zurück zur Karte"
+                icon="🏃"
+                color={'#6b4a7a'}
+                disabled={!heroTurn || !!ended}
+                onClick={backToMap}
+              />
+            </div>
+          </div>
+
+          {ended && (
+            <EndDialog
+              victory={ended === 'win'}
+              monsterName={MONSTER.name}
+              loot={MONSTER.loot}
+              onBack={backToMap}
+              onRetry={reset}
+            />
+          )}
+        </div>
+      );
+    }
+
+    function Root() {
+      return (
+        <IOSDevice dark={true}>
+          <BattleScreen />
+        </IOSDevice>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<Root />);
+  </script>
+</body>
+</html>

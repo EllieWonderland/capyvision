@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<title>Schatz — Besen & Bestien</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #1a1a1a; font-family: 'Quicksand', system-ui, sans-serif; }
+  body { display: flex; align-items: center; justify-content: center; overflow: hidden; }
+
+  /* Keyframes */
+  @keyframes shake {
+    0%,100%{transform:translate(0,0) rotate(0)}
+    10%{transform:translate(-3px,1px) rotate(-1.2deg)}
+    25%{transform:translate(3px,-1px) rotate(1.4deg)}
+    40%{transform:translate(-2px,2px) rotate(-1.8deg)}
+    55%{transform:translate(2px,-2px) rotate(1.6deg)}
+    70%{transform:translate(-3px,1px) rotate(-1.4deg)}
+    85%{transform:translate(3px,-1px) rotate(1.2deg)}
+  }
+  @keyframes lidOpen {
+    0%   { transform: translate(-50%, 0) rotateX(0deg); }
+    60%  { transform: translate(-50%, -10px) rotateX(-110deg); }
+    100% { transform: translate(-50%, -6px) rotateX(-100deg); }
+  }
+  @keyframes beam {
+    0%   { opacity: 0; transform: translateX(-50%) scaleY(0.2); }
+    30%  { opacity: 0.95; }
+    100% { opacity: 0.85; transform: translateX(-50%) scaleY(1); }
+  }
+  @keyframes burst {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0); }
+    40%  { opacity: 1; transform: translate(-50%, -50%) scale(1.3); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(2.2); }
+  }
+  @keyframes spin { to { transform: rotate(360deg) } }
+  @keyframes float {
+    0%,100% { transform: translateY(0) }
+    50% { transform: translateY(-8px) }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px) }
+    to { opacity: 1; transform: translateY(0) }
+  }
+  @keyframes starTwinkle {
+    0%,100% { opacity: 0; transform: scale(0.4) rotate(0deg) }
+    50%     { opacity: 1; transform: scale(1.1) rotate(180deg) }
+  }
+  @keyframes dust {
+    0% { opacity: 0; transform: translateY(0) scale(0.6) }
+    40% { opacity: 1 }
+    100% { opacity: 0; transform: translateY(-50px) scale(1.3) }
+  }
+  @keyframes countUp { from { transform: scale(1) } 40% { transform: scale(1.35) } to { transform: scale(1) } }
+  @keyframes scrollStars { from { background-position: 0 0 } to { background-position: 0 80px } }
+</style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script type="text/babel" src="ios-frame.jsx"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useMemo } = React;
+
+    const C = {
+      midnight: '#003844',
+      caribbean: '#006c67',
+      pink: '#f194b4',
+      yellow: '#ffb100',
+      cream: '#feebc6',
+      gold: '#ffd84a',
+      goldDark: '#b07a00',
+      wood: '#7a4a1a',
+      woodDark: '#4c2c0a',
+      woodLight: '#a6702e',
+    };
+
+    // ──────────────── CHEST SVG ────────────────
+    // Two-part chest: base (bottom) + lid (top, rotates open)
+    function ChestBase({ glow }) {
+      return (
+        <svg width="220" height="130" viewBox="0 0 220 130" style={{
+          filter: glow ? `drop-shadow(0 0 24px ${C.gold}aa)` : 'drop-shadow(0 10px 0 rgba(0,0,0,0.3))',
+          transition: 'filter 400ms',
+        }}>
+          {/* back wall (inside glow) */}
+          <rect x="22" y="18" width="176" height="70" rx="6" fill="#2a1608" />
+          {/* inner gold fill (only visible if lid open) */}
+          {glow && (
+            <>
+              <rect x="26" y="22" width="168" height="60" rx="4" fill="url(#goldFill)" />
+              <rect x="26" y="22" width="168" height="14" rx="4" fill="#fff3a8" opacity="0.5" />
+            </>
+          )}
+          {/* front body */}
+          <rect x="18" y="50" width="184" height="64" rx="10" fill={C.wood} stroke={C.woodDark} strokeWidth="3" />
+          {/* wood planks */}
+          <rect x="18" y="50" width="184" height="64" rx="10" fill="url(#plankGrain)" opacity="0.35" />
+          {/* bottom trim */}
+          <rect x="18" y="104" width="184" height="12" rx="4" fill={C.woodDark} />
+          {/* iron bands */}
+          <rect x="60" y="50" width="8" height="64" fill="#2a2a2a" />
+          <rect x="152" y="50" width="8" height="64" fill="#2a2a2a" />
+          {/* studs */}
+          {[64, 156].map(x => (
+            <g key={x}>
+              <circle cx={x+4} cy="60" r="3" fill="#888"/>
+              <circle cx={x+4} cy="80" r="3" fill="#888"/>
+              <circle cx={x+4} cy="100" r="3" fill="#888"/>
+            </g>
+          ))}
+          {/* keyhole plate */}
+          <rect x="100" y="70" width="20" height="26" rx="3" fill={C.goldDark} stroke="#3a2a0a" strokeWidth="1.5"/>
+          <circle cx="110" cy="80" r="3.5" fill="#1a0a00" />
+          <rect x="108.5" y="82" width="3" height="8" fill="#1a0a00" />
+          {/* feet */}
+          <rect x="18" y="112" width="18" height="10" rx="3" fill={C.woodDark}/>
+          <rect x="184" y="112" width="18" height="10" rx="3" fill={C.woodDark}/>
+
+          <defs>
+            <linearGradient id="goldFill" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0" stopColor="#fff3a8"/>
+              <stop offset="0.5" stopColor={C.gold}/>
+              <stop offset="1" stopColor={C.goldDark}/>
+            </linearGradient>
+            <pattern id="plankGrain" x="0" y="0" width="40" height="8" patternUnits="userSpaceOnUse">
+              <line x1="0" y1="4" x2="40" y2="4" stroke={C.woodDark} strokeWidth="0.8"/>
+            </pattern>
+          </defs>
+        </svg>
+      );
+    }
+
+    function ChestLid({ open }) {
+      return (
+        <div style={{
+          position: 'absolute', left: '50%', top: -6,
+          transformOrigin: '50% 100%',
+          animation: open ? 'lidOpen 600ms cubic-bezier(.5,1.6,.5,1) forwards' : 'none',
+          transform: 'translate(-50%, 0)',
+          willChange: 'transform',
+        }}>
+          <svg width="220" height="70" viewBox="0 0 220 70" style={{
+            filter: 'drop-shadow(0 4px 0 rgba(0,0,0,0.2))',
+          }}>
+            {/* lid body (rounded top) */}
+            <path d="M18 60 Q18 8 110 8 Q202 8 202 60 Z"
+                  fill={C.woodLight} stroke={C.woodDark} strokeWidth="3"/>
+            {/* grain */}
+            <path d="M18 60 Q18 8 110 8 Q202 8 202 60 Z" fill="url(#lidGrain)" opacity="0.3"/>
+            {/* iron bands extending lid */}
+            <path d="M60 60 Q60 18 68 14 L68 60 Z" fill="#2a2a2a"/>
+            <path d="M152 60 Q152 14 160 18 L160 60 Z" fill="#2a2a2a"/>
+            {/* latch */}
+            <rect x="100" y="46" width="20" height="14" rx="2" fill={C.goldDark} stroke="#3a2a0a" strokeWidth="1.2"/>
+            <rect x="103" y="40" width="14" height="8" rx="2" fill={C.goldDark}/>
+            {/* highlight */}
+            <path d="M40 20 Q110 4 180 20" stroke="#d9a25f" strokeWidth="2" fill="none" opacity="0.7"/>
+            <defs>
+              <pattern id="lidGrain" x="0" y="0" width="40" height="8" patternUnits="userSpaceOnUse">
+                <line x1="0" y1="4" x2="40" y2="4" stroke={C.woodDark} strokeWidth="0.8"/>
+              </pattern>
+            </defs>
+          </svg>
+        </div>
+      );
+    }
+
+    // Light beams that shoot out of the open chest
+    function LightBeams() {
+      const beams = [-30, -15, 0, 15, 30, -45, 45];
+      return (
+        <div style={{
+          position: 'absolute', left: '50%', top: 12,
+          width: 0, height: 0, pointerEvents: 'none', zIndex: 0,
+        }}>
+          {beams.map((r, i) => (
+            <div key={i} style={{
+              position: 'absolute', left: '50%', top: 0,
+              width: 30, height: 260,
+              background: `linear-gradient(to top, ${C.yellow}00, ${C.yellow}cc 60%, #fff9e0)`,
+              transform: `translateX(-50%) rotate(${r}deg)`,
+              transformOrigin: '50% 100%',
+              animation: `beam 700ms ease-out ${i * 40}ms forwards`,
+              opacity: 0,
+              mixBlendMode: 'screen',
+              borderRadius: '50% 50% 0 0 / 10% 10% 0 0',
+              filter: 'blur(2px)',
+            }} />
+          ))}
+          {/* soft radial bloom */}
+          <div style={{
+            position: 'absolute', left: '50%', top: 0,
+            width: 360, height: 360,
+            transform: 'translate(-50%, -50%)',
+            background: `radial-gradient(circle, ${C.yellow}66, transparent 60%)`,
+            animation: 'burst 900ms ease-out forwards',
+            mixBlendMode: 'screen',
+          }} />
+        </div>
+      );
+    }
+
+    // Coin sprite – spinning gold coin
+    function Coin({ delay, dx, rise, spin = true, float = true }) {
+      return (
+        <div style={{
+          position: 'absolute', left: '50%', top: '50%',
+          transform: `translate(calc(-50% + ${dx}px), calc(-50% - ${rise}px))`,
+          animation: float ? `float 2s ease-in-out ${delay}ms infinite` : 'none',
+        }}>
+          <div style={{
+            width: 28, height: 28,
+            animation: spin ? `spin 1.6s linear ${delay}ms infinite` : 'none',
+          }}>
+            <svg width="28" height="28" viewBox="0 0 28 28">
+              <circle cx="14" cy="14" r="12" fill={C.gold} stroke={C.goldDark} strokeWidth="2"/>
+              <circle cx="14" cy="14" r="8" fill="none" stroke={C.goldDark} strokeWidth="1" opacity="0.7"/>
+              <text x="14" y="18" textAnchor="middle" fontSize="12" fontWeight="900" fill={C.goldDark}>$</text>
+            </svg>
+          </div>
+        </div>
+      );
+    }
+
+    // Star/sparkle that twinkles
+    function Sparkle({ x, y, size = 14, delay = 0 }) {
+      return (
+        <div style={{
+          position: 'absolute', left: x, top: y,
+          width: size, height: size,
+          animation: `starTwinkle 1.8s ease-in-out ${delay}ms infinite`,
+        }}>
+          <svg viewBox="0 0 24 24" width={size} height={size}>
+            <path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" fill={C.cream}/>
+          </svg>
+        </div>
+      );
+    }
+
+    // Dust puff from under chest
+    function DustPuff({ x, delay }) {
+      return (
+        <div style={{
+          position: 'absolute', left: x, bottom: 40,
+          width: 18, height: 18, borderRadius: '50%',
+          background: 'rgba(255,235,198,0.5)',
+          animation: `dust 900ms ease-out ${delay}ms forwards`,
+          opacity: 0,
+          filter: 'blur(2px)',
+        }} />
+      );
+    }
+
+    // ──────────────── COUNT-UP ────────────────
+    function useCountUp(target, duration = 900, start = false) {
+      const [n, setN] = useState(0);
+      useEffect(() => {
+        if (!start) { setN(0); return; }
+        let raf, t0;
+        const step = (t) => {
+          if (!t0) t0 = t;
+          const p = Math.min(1, (t - t0) / duration);
+          const eased = 1 - Math.pow(1 - p, 3);
+          setN(Math.round(target * eased));
+          if (p < 1) raf = requestAnimationFrame(step);
+        };
+        raf = requestAnimationFrame(step);
+        return () => cancelAnimationFrame(raf);
+      }, [target, duration, start]);
+      return n;
+    }
+
+    // ──────────────── MAIN TREASURE SCREEN ────────────────
+    function TreasureScreen() {
+      // Phases: 'idle' -> 'shaking' -> 'opening' -> 'erupting' -> 'revealed'
+      const [phase, setPhase] = useState('idle');
+      const autoPlayedRef = useRef(false);
+
+      const coinsTotal = 25;
+      const hasBonus = true;
+      const bonusItem = { emoji: '💎', name: 'Kristall-Splitter', tint: '#7bc6ff' };
+
+      const showCoinsCounter = phase === 'revealed' || phase === 'erupting';
+      const countedCoins = useCountUp(coinsTotal, 900, showCoinsCounter);
+
+      // Auto-start the animation once mounted
+      useEffect(() => {
+        if (autoPlayedRef.current) return;
+        autoPlayedRef.current = true;
+        const timers = [];
+        timers.push(setTimeout(() => setPhase('shaking'), 450));
+        timers.push(setTimeout(() => setPhase('opening'), 450 + 1100));
+        timers.push(setTimeout(() => setPhase('erupting'), 450 + 1100 + 350));
+        timers.push(setTimeout(() => setPhase('revealed'), 450 + 1100 + 350 + 700));
+        return () => timers.forEach(clearTimeout);
+      }, []);
+
+      const replay = () => {
+        setPhase('idle');
+        setTimeout(() => setPhase('shaking'), 200);
+        setTimeout(() => setPhase('opening'), 200 + 1100);
+        setTimeout(() => setPhase('erupting'), 200 + 1100 + 350);
+        setTimeout(() => setPhase('revealed'), 200 + 1100 + 350 + 700);
+      };
+
+      const backToMap = () => { window.location.href = 'Wunderwald Map.html'; };
+
+      const lidOpen = phase === 'opening' || phase === 'erupting' || phase === 'revealed';
+      const showBeams = phase === 'erupting' || phase === 'revealed';
+      const showCoins = phase === 'erupting' || phase === 'revealed';
+      const showReveal = phase === 'revealed';
+      const shaking = phase === 'shaking';
+
+      return (
+        <div data-screen-label="03 Schatz" style={{
+          position: 'relative', width: '100%', height: '100%',
+          overflow: 'hidden',
+          background: `radial-gradient(ellipse at 50% 40%, #1f5b58 0%, #003844 55%, #001a20 100%)`,
+        }}>
+          {/* animated stars */}
+          <div style={{
+            position: 'absolute', inset: 0, opacity: 0.35, zIndex: 0,
+            background: `
+              radial-gradient(circle at 20% 30%, ${C.cream} 1px, transparent 2px),
+              radial-gradient(circle at 80% 60%, ${C.cream} 1px, transparent 2px),
+              radial-gradient(circle at 40% 80%, ${C.cream} 1px, transparent 2px),
+              radial-gradient(circle at 65% 20%, ${C.cream} 1px, transparent 2px),
+              radial-gradient(circle at 15% 70%, ${C.cream} 1px, transparent 2px)
+            `,
+            backgroundSize: '120px 120px, 160px 160px, 200px 200px, 140px 140px, 180px 180px',
+            animation: 'scrollStars 14s linear infinite',
+          }} />
+
+          {/* top bar */}
+          <div style={{
+            position: 'relative', zIndex: 3,
+            padding: '56px 16px 10px',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          }}>
+            <button onClick={backToMap} style={{
+              background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,235,198,0.3)',
+              color: C.cream, width: 38, height: 38, borderRadius: 19,
+              fontSize: 18, cursor: 'pointer', fontFamily: 'inherit',
+            }}>←</button>
+            <div style={{
+              color: C.cream, fontSize: 18, fontWeight: 900, letterSpacing: 2,
+              textShadow: '0 2px 0 rgba(0,0,0,0.4)',
+            }}>✨ SCHATZ</div>
+            <button onClick={replay} style={{
+              background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,235,198,0.3)',
+              color: C.cream, width: 38, height: 38, borderRadius: 19,
+              fontSize: 16, cursor: 'pointer', fontFamily: 'inherit',
+            }} title="Nochmal">↻</button>
+          </div>
+
+          {/* Headline */}
+          <div style={{
+            position: 'relative', zIndex: 2,
+            textAlign: 'center', color: C.cream,
+            marginTop: 6, marginBottom: 8, padding: '0 24px',
+            minHeight: 52,
+          }}>
+            {phase === 'idle' || phase === 'shaking' ? (
+              <>
+                <div style={{ fontSize: 13, fontWeight: 700, opacity: 0.7, letterSpacing: 2 }}>
+                  DU HAST EINEN SCHATZ GEFUNDEN
+                </div>
+                <div style={{ fontSize: 22, fontWeight: 900, marginTop: 4 }}>
+                  Was wohl darin ist?
+                </div>
+              </>
+            ) : phase === 'opening' ? (
+              <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: 1 }}>
+                ✨ Öffnet sich… ✨
+              </div>
+            ) : (
+              <div style={{
+                fontSize: 26, fontWeight: 900, letterSpacing: 1,
+                color: C.yellow,
+                textShadow: `0 0 14px ${C.yellow}88, 0 3px 0 rgba(0,0,0,0.4)`,
+                animation: 'fadeUp 400ms ease-out',
+              }}>
+                WUNDERBAR!
+              </div>
+            )}
+          </div>
+
+          {/* Chest stage */}
+          <div style={{
+            position: 'relative', zIndex: 2,
+            height: 280, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            marginTop: 4,
+          }}>
+            {/* ground shadow */}
+            <div style={{
+              position: 'absolute', bottom: 34, left: '50%',
+              transform: 'translateX(-50%)',
+              width: 200, height: 28, borderRadius: '50%',
+              background: 'radial-gradient(ellipse, rgba(0,0,0,0.55), transparent 70%)',
+              zIndex: 0,
+            }} />
+
+            {/* beams behind chest */}
+            {showBeams && <LightBeams />}
+
+            {/* dust puffs when shaking */}
+            {shaking && (
+              <>
+                <DustPuff x="calc(50% - 90px)" delay={0}/>
+                <DustPuff x="calc(50% + 70px)" delay={120}/>
+                <DustPuff x="calc(50% - 50px)" delay={260}/>
+                <DustPuff x="calc(50% + 40px)" delay={380}/>
+              </>
+            )}
+
+            {/* sparkles around chest when revealed */}
+            {showReveal && (
+              <>
+                <Sparkle x="18%" y="20%" size={14} delay={0}/>
+                <Sparkle x="78%" y="18%" size={18} delay={200}/>
+                <Sparkle x="12%" y="58%" size={12} delay={500}/>
+                <Sparkle x="82%" y="62%" size={16} delay={700}/>
+                <Sparkle x="50%" y="8%" size={20} delay={300}/>
+                <Sparkle x="30%" y="72%" size={10} delay={900}/>
+                <Sparkle x="68%" y="78%" size={12} delay={1100}/>
+              </>
+            )}
+
+            {/* Chest assembly */}
+            <div style={{
+              position: 'relative', width: 240, height: 220,
+              animation: shaking ? 'shake 1s ease-in-out' : 'none',
+              display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+            }}>
+              {/* base */}
+              <div style={{ position: 'relative' }}>
+                <ChestBase glow={lidOpen}/>
+                {/* lid anchored to top of base */}
+                <ChestLid open={lidOpen}/>
+              </div>
+
+              {/* coins erupting out of chest */}
+              {showCoins && (
+                <div style={{
+                  position: 'absolute', left: '50%', top: 60,
+                  width: 0, height: 0, zIndex: 2, pointerEvents: 'none',
+                }}>
+                  <Coin delay={0}   dx={-30} rise={20}/>
+                  <Coin delay={100} dx={20}  rise={30}/>
+                  <Coin delay={200} dx={-10} rise={50}/>
+                  <Coin delay={300} dx={40}  rise={10}/>
+                  <Coin delay={400} dx={-40} rise={40}/>
+                  <Coin delay={500} dx={10}  rise={60}/>
+                  <Coin delay={600} dx={-20} rise={70}/>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Reward panel */}
+          <div style={{
+            position: 'absolute', left: 14, right: 14, bottom: 24, zIndex: 3,
+            opacity: showReveal ? 1 : 0,
+            transform: showReveal ? 'translateY(0)' : 'translateY(20px)',
+            transition: 'opacity 420ms ease-out, transform 420ms ease-out',
+            pointerEvents: showReveal ? 'auto' : 'none',
+          }}>
+            <div style={{
+              background: C.cream, borderRadius: 22, padding: 16,
+              boxShadow: '0 10px 30px rgba(0,0,0,0.4), 0 6px 0 rgba(0,0,0,0.15)',
+              border: '2px solid rgba(0,0,0,0.08)',
+            }}>
+              <div style={{
+                fontSize: 11, fontWeight: 800, letterSpacing: 2,
+                color: C.caribbean, textAlign: 'center', marginBottom: 10,
+              }}>DEINE BELOHNUNG</div>
+
+              {/* Coins row */}
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 12,
+                background: 'white', borderRadius: 14, padding: '10px 14px',
+                marginBottom: hasBonus ? 8 : 14,
+                boxShadow: 'inset 0 2px 0 rgba(0,0,0,0.04)',
+              }}>
+                <div style={{
+                  width: 44, height: 44, borderRadius: '50%',
+                  background: `radial-gradient(circle at 35% 30%, #fff3a8, ${C.gold} 60%, ${C.goldDark})`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 22, fontWeight: 900, color: C.goldDark,
+                  boxShadow: `0 3px 0 ${C.goldDark}, 0 0 14px ${C.gold}77`,
+                }}>$</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#777' }}>Münzen</div>
+                  <div style={{
+                    fontSize: 24, fontWeight: 900, color: C.midnight,
+                    display: 'inline-block',
+                    animation: showReveal ? 'countUp 280ms ease-out' : 'none',
+                  }}>
+                    +{countedCoins}
+                  </div>
+                </div>
+                <div style={{
+                  background: C.yellow, color: C.midnight,
+                  fontSize: 10, fontWeight: 900, padding: '3px 8px',
+                  borderRadius: 8, letterSpacing: 1,
+                  boxShadow: `0 2px 0 ${C.goldDark}`,
+                }}>GOLD</div>
+              </div>
+
+              {/* Bonus row */}
+              {hasBonus && (
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 12,
+                  background: 'white', borderRadius: 14, padding: '10px 14px',
+                  marginBottom: 14,
+                  animation: showReveal ? 'fadeUp 500ms ease-out 300ms both' : 'none',
+                }}>
+                  <div style={{
+                    width: 44, height: 44, borderRadius: 12,
+                    background: `linear-gradient(135deg, ${bonusItem.tint}, ${bonusItem.tint}88)`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 24,
+                    boxShadow: `0 3px 0 rgba(0,0,0,0.15), 0 0 12px ${bonusItem.tint}88`,
+                  }}>{bonusItem.emoji}</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#777' }}>Bonus-Fund</div>
+                    <div style={{ fontSize: 16, fontWeight: 800, color: C.midnight }}>{bonusItem.name}</div>
+                  </div>
+                  <div style={{
+                    background: '#e9f4ff', color: '#2a6aa8',
+                    fontSize: 10, fontWeight: 900, padding: '3px 8px',
+                    borderRadius: 8, letterSpacing: 1,
+                  }}>SELTEN</div>
+                </div>
+              )}
+
+              <button onClick={backToMap} style={{
+                width: '100%', padding: '14px', borderRadius: 14,
+                border: 'none', background: C.caribbean, color: 'white',
+                fontSize: 16, fontWeight: 900, fontFamily: 'inherit',
+                letterSpacing: 1, cursor: 'pointer',
+                boxShadow: `0 5px 0 ${C.midnight}`,
+                transform: 'translateY(0)', transition: 'transform 80ms',
+              }}
+              onMouseDown={e => e.currentTarget.style.transform = 'translateY(2px)'}
+              onMouseUp={e => e.currentTarget.style.transform = 'translateY(0)'}>
+                EINSAMMELN
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function Root() {
+      return (
+        <IOSDevice dark={true}>
+          <TreasureScreen />
+        </IOSDevice>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<Root />);
+  </script>
+</body>
+</html>

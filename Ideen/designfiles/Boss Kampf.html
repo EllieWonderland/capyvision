@@ -1,0 +1,853 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<title>Boss-Kampf — Besen & Bestien</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #1a1a1a; font-family: 'Quicksand', system-ui, sans-serif; }
+  body { display: flex; align-items: center; justify-content: center; overflow: hidden; }
+
+  @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes slideUp { from { transform: translateY(100%) } to { transform: translateY(0) } }
+  @keyframes slideDown { from { transform: translateY(-100%) } to { transform: translateY(0) } }
+
+  @keyframes shakeHard {
+    0%,100%{transform:translate(0,0)}
+    10%{transform:translate(-10px,3px)}
+    25%{transform:translate(10px,-3px)}
+    40%{transform:translate(-8px,4px)}
+    55%{transform:translate(8px,-4px)}
+    70%{transform:translate(-10px,2px)}
+    85%{transform:translate(10px,-2px)}
+  }
+  @keyframes shake {
+    0%,100%{transform:translate(0,0)}
+    25%{transform:translate(-6px,2px)}
+    50%{transform:translate(6px,-2px)}
+    75%{transform:translate(-4px,1px)}
+  }
+  @keyframes flash { 0%,100%{filter:brightness(1)} 50%{filter:brightness(2) saturate(2.2)} }
+  @keyframes flashRed { 0%,100%{background:transparent} 50%{background:rgba(255,40,40,0.3)} }
+  @keyframes flashWhite { 0%,100%{background:transparent} 50%{background:rgba(255,255,255,0.7)} }
+  @keyframes floatUp {
+    0% { transform: translate(-50%, 0); opacity: 1 }
+    100% { transform: translate(-50%, -80px); opacity: 0 }
+  }
+  @keyframes bossBreath {
+    0%,100% { transform: scale(1) translateY(0) }
+    50%     { transform: scale(1.04) translateY(-3px) }
+  }
+  @keyframes bossEnraged {
+    0%,100% { transform: scale(1.08) translateY(-4px) }
+    50%     { transform: scale(1.14) translateY(-8px) }
+  }
+  @keyframes heroIdle { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-4px) } }
+
+  @keyframes pulseGlow {
+    0%,100% { box-shadow: 0 0 0 0 rgba(255,177,0,0.7), 0 5px 0 #b07a00 }
+    50%     { box-shadow: 0 0 0 14px rgba(255,177,0,0), 0 5px 0 #b07a00 }
+  }
+  @keyframes pulseRed {
+    0%,100% { box-shadow: 0 0 0 0 rgba(255,80,80,0.6), 0 5px 0 #5a1010 }
+    50%     { box-shadow: 0 0 0 14px rgba(255,80,80,0), 0 5px 0 #5a1010 }
+  }
+  @keyframes spiralExpand {
+    0% { opacity: 0; transform: translate(-50%,-50%) scale(0.2) rotate(0deg) }
+    40% { opacity: 1 }
+    100% { opacity: 0; transform: translate(-50%,-50%) scale(2.4) rotate(360deg) }
+  }
+  @keyframes slashStroke {
+    0% { stroke-dashoffset: 200; opacity: 0 }
+    20% { opacity: 1 }
+    100% { stroke-dashoffset: 0; opacity: 0 }
+  }
+  @keyframes scrollBg {
+    from { background-position: 0 0 } to { background-position: 0 100px }
+  }
+  @keyframes phaseFlash {
+    0% { opacity: 0; background: rgba(255,40,40,0); }
+    10% { opacity: 1; background: rgba(255,40,40,0.45); }
+    100% { opacity: 0; background: rgba(255,40,40,0); }
+  }
+  @keyframes phaseTitle {
+    0%   { transform: translateY(20px) scale(0.6); opacity: 0; letter-spacing: 0; }
+    20%  { transform: translateY(0) scale(1.15); opacity: 1; letter-spacing: 6px; }
+    80%  { transform: translateY(0) scale(1); opacity: 1; letter-spacing: 4px; }
+    100% { transform: translateY(-20px) scale(0.9); opacity: 0; letter-spacing: 4px; }
+  }
+  @keyframes ember {
+    0%   { opacity: 0; transform: translateY(0) }
+    20%  { opacity: 1 }
+    100% { opacity: 0; transform: translateY(-200px) }
+  }
+</style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script type="text/babel" src="ios-frame.jsx"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+    const C = {
+      midnight: '#003844',
+      caribbean: '#006c67',
+      pink: '#f194b4',
+      yellow: '#ffb100',
+      cream: '#feebc6',
+      bossPurple: '#5c2a7a',
+      bossDeep: '#2b0f3f',
+      red: '#e24c4c',
+    };
+    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+    // ──────────────── BOSS HP BAR (segmented) ────────────────
+    function BossHPBar({ cur, max, enraged }) {
+      const pct = clamp(cur / max, 0, 1);
+      const barColor = enraged ? '#ff5050' : pct > 0.5 ? C.pink : C.yellow;
+      return (
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+            <span style={{ fontSize: 11, fontWeight: 900, color: C.cream, letterSpacing: 2 }}>BOSS-LP</span>
+            <span style={{ fontSize: 12, fontWeight: 800, color: enraged ? '#ff8a8a' : C.cream, fontVariantNumeric: 'tabular-nums' }}>
+              {cur} / {max}
+            </span>
+          </div>
+          <div style={{
+            height: 18, borderRadius: 4, position: 'relative',
+            background: 'rgba(0,0,0,0.5)',
+            border: `2px solid ${C.cream}`,
+            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.6), 0 2px 0 rgba(0,0,0,0.3)',
+            overflow: 'hidden',
+          }}>
+            <div style={{
+              width: `${pct * 100}%`, height: '100%',
+              background: `linear-gradient(to bottom, ${barColor}, ${barColor}aa)`,
+              transition: 'width 500ms cubic-bezier(.2,.8,.2,1)',
+              boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.4)',
+            }} />
+            {/* segment dividers */}
+            {[20, 40, 60, 80].map(p => (
+              <div key={p} style={{
+                position: 'absolute', left: `${p}%`, top: 0, bottom: 0,
+                width: 1, background: 'rgba(0,0,0,0.5)',
+              }} />
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    function HeroHPBar({ cur, max }) {
+      const pct = clamp(cur / max, 0, 1);
+      const color = pct > 0.5 ? C.caribbean : pct > 0.25 ? C.yellow : C.red;
+      return (
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontWeight: 800, color: C.midnight, marginBottom: 3 }}>
+            <span>LP</span>
+            <span style={{ color: pct <= 0.25 ? '#c44' : C.midnight, fontVariantNumeric: 'tabular-nums' }}>
+              {cur} / {max}
+            </span>
+          </div>
+          <div style={{
+            height: 12, borderRadius: 6, background: 'rgba(0,0,0,0.18)',
+            overflow: 'hidden', boxShadow: 'inset 0 2px 3px rgba(0,0,0,0.25)',
+          }}>
+            <div style={{
+              width: `${pct * 100}%`, height: '100%',
+              background: `linear-gradient(to bottom, ${color}, ${color}cc)`,
+              transition: 'width 450ms cubic-bezier(.2,.8,.2,1)',
+              boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.35)',
+            }} />
+          </div>
+        </div>
+      );
+    }
+
+    // ──────────────── BOSS SPRITE ────────────────
+    function BossSprite({ active, hurt, attacking, special, enraged, floatText }) {
+      const animName = enraged && active ? 'bossEnraged' : 'bossBreath';
+      const wrapAnim =
+        hurt ? 'shakeHard 350ms ease' :
+        attacking ? 'shake 250ms ease' :
+        `${animName} 2.4s ease-in-out infinite`;
+      return (
+        <div style={{
+          position: 'relative', width: 160, height: 160,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          {/* aura */}
+          <div style={{
+            position: 'absolute', width: 200, height: 90, bottom: 12,
+            borderRadius: '50%',
+            background: enraged
+              ? `radial-gradient(ellipse, #ff404088, transparent 70%)`
+              : `radial-gradient(ellipse, ${C.bossPurple}88, transparent 70%)`,
+            filter: 'blur(2px)',
+          }} />
+          {/* shadow */}
+          <div style={{
+            position: 'absolute', width: 130, height: 22, bottom: 0,
+            borderRadius: '50%',
+            background: 'radial-gradient(ellipse, rgba(0,0,0,0.7), transparent 70%)',
+          }} />
+          {/* sprite */}
+          <div style={{
+            animation: wrapAnim,
+            filter: enraged
+              ? `drop-shadow(0 0 18px #ff4040cc) drop-shadow(0 6px 4px rgba(0,0,0,0.5))`
+              : `drop-shadow(0 6px 6px rgba(0,0,0,0.4))`,
+            transition: 'filter 400ms',
+          }}>
+            <div style={{
+              fontSize: 130, lineHeight: 1, position: 'relative',
+              animation: special ? 'flash 600ms ease' : 'none',
+            }}>🐻</div>
+          </div>
+          {/* crown */}
+          <div style={{
+            position: 'absolute', top: 4, left: '50%', transform: 'translateX(-50%)',
+            fontSize: 36, filter: 'drop-shadow(0 2px 2px rgba(0,0,0,0.5))',
+          }}>👑</div>
+          {/* float text */}
+          {floatText && (
+            <div key={floatText.k} style={{
+              position: 'absolute', top: 12, left: '50%',
+              animation: 'floatUp 1100ms ease-out forwards',
+              fontSize: 36, fontWeight: 900,
+              color: floatText.color,
+              WebkitTextStroke: `2px ${C.midnight}`,
+              textShadow: '0 3px 0 rgba(0,0,0,0.4)',
+              pointerEvents: 'none', whiteSpace: 'nowrap',
+            }}>{floatText.text}</div>
+          )}
+        </div>
+      );
+    }
+
+    function HeroSprite({ active, hurt, attacking, defending, floatText }) {
+      const wrapAnim =
+        hurt ? 'shake 350ms ease' :
+        attacking ? 'flash 280ms ease' :
+        active ? 'heroIdle 1.6s ease-in-out infinite' : 'none';
+      return (
+        <div style={{
+          position: 'relative', width: 100, height: 100,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          {/* shadow */}
+          <div style={{
+            position: 'absolute', width: 80, height: 14, bottom: 0,
+            borderRadius: '50%',
+            background: 'radial-gradient(ellipse, rgba(0,0,0,0.55), transparent 70%)',
+          }} />
+          {/* defending shield ring */}
+          {defending && (
+            <div style={{
+              position: 'absolute', width: 110, height: 110, borderRadius: '50%',
+              border: `3px solid ${C.yellow}`,
+              boxShadow: `0 0 20px ${C.yellow}aa, inset 0 0 12px ${C.yellow}77`,
+              animation: 'fadeIn 200ms ease-out',
+            }}/>
+          )}
+          <div style={{
+            animation: wrapAnim,
+            filter: 'drop-shadow(0 4px 4px rgba(0,0,0,0.4))',
+            fontSize: 76, lineHeight: 1,
+          }}>🛡️</div>
+          {floatText && (
+            <div key={floatText.k} style={{
+              position: 'absolute', top: 0, left: '50%',
+              animation: 'floatUp 900ms ease-out forwards',
+              fontSize: 28, fontWeight: 900,
+              color: floatText.color,
+              WebkitTextStroke: `1.5px ${C.midnight}`,
+              textShadow: '0 2px 0 rgba(0,0,0,0.4)',
+              pointerEvents: 'none',
+            }}>{floatText.text}</div>
+          )}
+        </div>
+      );
+    }
+
+    // ──────────────── SPECIAL ATTACK FX ────────────────
+    function SpiralFX({ k }) {
+      return (
+        <div key={k} style={{
+          position: 'absolute', left: '50%', top: '50%', zIndex: 30,
+          width: 200, height: 200,
+          transform: 'translate(-50%, -50%)',
+          pointerEvents: 'none',
+        }}>
+          <div style={{
+            position: 'absolute', left: '50%', top: '50%',
+            width: 240, height: 240, borderRadius: '50%',
+            border: `4px solid ${C.bossPurple}`,
+            animation: 'spiralExpand 700ms ease-out forwards',
+          }}/>
+          <div style={{
+            position: 'absolute', left: '50%', top: '50%',
+            width: 180, height: 180, borderRadius: '50%',
+            border: `3px solid ${C.pink}`,
+            animation: 'spiralExpand 700ms ease-out 100ms forwards',
+          }}/>
+        </div>
+      );
+    }
+
+    function SlashFX({ k }) {
+      return (
+        <svg key={k} style={{
+          position: 'absolute', left: '50%', top: '50%',
+          width: 180, height: 180, zIndex: 30,
+          transform: 'translate(-50%,-50%)',
+          pointerEvents: 'none',
+        }} viewBox="0 0 180 180">
+          {[0, 50, 100].map((delay, i) => (
+            <line key={i}
+              x1={20 + i*8} y1={150 - i*6}
+              x2={160 - i*8} y2={30 + i*6}
+              stroke={C.yellow} strokeWidth="6" strokeLinecap="round"
+              strokeDasharray="200" strokeDashoffset="200"
+              style={{ animation: `slashStroke 500ms ease-out ${delay}ms forwards`, filter: 'drop-shadow(0 0 6px '+C.yellow+')' }}
+            />
+          ))}
+        </svg>
+      );
+    }
+
+    function ScreenFlash({ kind, k }) {
+      if (!kind) return null;
+      return (
+        <div key={k} style={{
+          position: 'absolute', inset: 0, zIndex: 50, pointerEvents: 'none',
+          animation: kind === 'red' ? 'phaseFlash 600ms ease-out forwards' : 'flashWhite 280ms ease-out forwards',
+        }}/>
+      );
+    }
+
+    function PhaseTitle({ k }) {
+      if (!k) return null;
+      return (
+        <div key={k} style={{
+          position: 'absolute', left: 0, right: 0, top: '40%', zIndex: 60,
+          textAlign: 'center', pointerEvents: 'none',
+        }}>
+          <div style={{
+            color: '#ff6a6a', fontSize: 36, fontWeight: 900, letterSpacing: 4,
+            textShadow: `0 0 20px #ff404088, 0 4px 0 rgba(0,0,0,0.5)`,
+            animation: 'phaseTitle 1800ms ease-out forwards',
+          }}>PHASE 2</div>
+          <div style={{
+            color: C.cream, fontSize: 14, fontWeight: 800, letterSpacing: 3, marginTop: 6,
+            animation: 'phaseTitle 1800ms ease-out 100ms forwards',
+            opacity: 0,
+          }}>WALDRIESE BÄR ENTFESSELT</div>
+        </div>
+      );
+    }
+
+    // ──────────────── BATTLE LOG ────────────────
+    function BossLog({ entries, isHeroTurn, ended, enraged }) {
+      const last = entries.slice(-2);
+      return (
+        <div style={{
+          background: 'rgba(0,0,0,0.65)', borderRadius: 10,
+          padding: '8px 12px', color: C.cream, fontSize: 13,
+          lineHeight: 1.4, minHeight: 56,
+          border: `1px solid ${enraged ? '#ff404066' : 'rgba(255,235,198,0.18)'}`,
+          boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.5)',
+        }}>
+          {!ended && (
+            <div style={{
+              fontSize: 10, fontWeight: 900, letterSpacing: 2, marginBottom: 4,
+              color: isHeroTurn ? '#6be289' : '#ff6a6a',
+            }}>
+              {isHeroTurn ? '⚔️  DEIN ZUG' : enraged ? '🔥 BOSS — RASEND' : '🔴 BOSS'}
+            </div>
+          )}
+          {last.length === 0 ? (
+            <div style={{ opacity: 0.6 }}>Wähle eine Aktion…</div>
+          ) : (
+            last.map((e, i) => (
+              <div key={entries.length - last.length + i} style={{
+                opacity: 0.6 + 0.4 * i,
+                fontWeight: i === last.length - 1 ? 700 : 500,
+              }}>{e}</div>
+            ))
+          )}
+        </div>
+      );
+    }
+
+    // ──────────────── ATTACK BUTTONS ────────────────
+    function ActionBtn({ title, sub, icon, color, disabled, onClick, highlight, danger }) {
+      return (
+        <button disabled={disabled} onClick={onClick} style={{
+          flex: 1, padding: '10px 12px', borderRadius: 12,
+          border: 'none', textAlign: 'left',
+          background: disabled ? '#4f5a60' : color,
+          color: disabled ? '#aab0b4' : 'white',
+          fontFamily: 'inherit', cursor: disabled ? 'not-allowed' : 'pointer',
+          boxShadow: disabled ? 'none' : `0 5px 0 rgba(0,0,0,0.35)`,
+          transition: 'transform 80ms',
+          display: 'flex', gap: 10, alignItems: 'center',
+          animation: highlight && !disabled
+            ? (danger ? 'pulseRed 1.4s ease-in-out infinite' : 'pulseGlow 1.4s ease-in-out infinite')
+            : 'none',
+        }}
+        onMouseDown={e => !disabled && (e.currentTarget.style.transform = 'translateY(2px)')}
+        onMouseUp={e => !disabled && (e.currentTarget.style.transform = 'translateY(0)')}
+        >
+          <span style={{ fontSize: 24 }}>{icon}</span>
+          <span style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 13, fontWeight: 800 }}>{title}</div>
+            <div style={{ fontSize: 10.5, fontWeight: 600, opacity: 0.85 }}>{sub}</div>
+          </span>
+        </button>
+      );
+    }
+
+    // ──────────────── END DIALOG ────────────────
+    function EndDialog({ victory, name, loot, onBack, onRetry }) {
+      return (
+        <>
+          <div style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.6)', zIndex: 70, animation: 'fadeIn 200ms ease-out' }} onClick={onBack}/>
+          <div style={{
+            position:'absolute', left: 18, right: 18, top: '50%', transform: 'translateY(-50%)', zIndex: 71,
+            background: C.cream, borderRadius: 24, padding: 24, color: C.midnight, textAlign: 'center',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.5)', animation: 'slideUp 300ms cubic-bezier(.2,.8,.2,1)',
+            border: victory ? `4px solid ${C.yellow}` : `4px solid ${C.red}`,
+          }}>
+            <div style={{ fontSize: 64, marginBottom: 4 }}>{victory ? '🏆' : '💀'}</div>
+            <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 4, color: victory ? C.caribbean : '#a83961' }}>
+              {victory ? 'BOSS BESIEGT' : 'NIEDERLAGE'}
+            </div>
+            <div style={{ fontSize: 28, fontWeight: 900, marginTop: 4, marginBottom: 6 }}>
+              {victory ? 'EPISCHER SIEG!' : 'ZU MÄCHTIG'}
+            </div>
+            <div style={{ fontSize: 14, opacity: 0.8, marginBottom: 16 }}>
+              {victory
+                ? `Du hast ${name} bezwungen!`
+                : `${name} war stärker als du. Stärke dich und kehre zurück!`}
+            </div>
+            {victory && (
+              <div style={{
+                display: 'inline-flex', gap: 14, alignItems: 'center',
+                background: C.yellow, color: C.midnight, borderRadius: 14,
+                padding: '10px 18px', fontSize: 16, fontWeight: 800, marginBottom: 18,
+                boxShadow: `0 3px 0 #b07a00`,
+              }}>
+                <span>🪙 +{loot} Münzen</span>
+                <span style={{ width: 1, height: 16, background: 'rgba(0,0,0,0.3)' }}/>
+                <span>⭐ +50 XP</span>
+              </div>
+            )}
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={onRetry} style={{
+                flex: 1, padding: 12, borderRadius: 14, border: 'none',
+                background: 'white', color: C.midnight, fontWeight: 800, fontSize: 15,
+                fontFamily: 'inherit', cursor: 'pointer', boxShadow: '0 4px 0 #c8b98a',
+              }}>Nochmal</button>
+              <button onClick={onBack} style={{
+                flex: 1, padding: 12, borderRadius: 14, border: 'none',
+                background: C.caribbean, color: 'white', fontWeight: 800, fontSize: 15,
+                fontFamily: 'inherit', cursor: 'pointer', boxShadow: '0 4px 0 #00413e',
+              }}>Zur Karte</button>
+            </div>
+          </div>
+        </>
+      );
+    }
+
+    // ──────────────── ARENA BACKGROUND ────────────────
+    function Arena({ enraged }) {
+      return (
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: enraged
+              ? `radial-gradient(ellipse at 50% 30%, #6a1018 0%, #2a0608 60%, #100002 100%)`
+              : `radial-gradient(ellipse at 50% 30%, ${C.bossPurple} 0%, ${C.bossDeep} 55%, #0a041a 100%)`,
+            transition: 'background 700ms ease',
+          }}/>
+          {/* runes / fog */}
+          <div style={{
+            position: 'absolute', inset: 0, opacity: 0.18,
+            background: `
+              radial-gradient(circle at 18% 24%, ${C.cream} 1px, transparent 2px),
+              radial-gradient(circle at 76% 56%, ${C.cream} 1px, transparent 2px),
+              radial-gradient(circle at 38% 78%, ${C.cream} 1px, transparent 2px),
+              radial-gradient(circle at 62% 14%, ${C.cream} 1px, transparent 2px)
+            `,
+            backgroundSize: '140px 140px, 180px 180px, 220px 220px, 160px 160px',
+            animation: 'scrollBg 14s linear infinite',
+          }}/>
+          {/* embers when enraged */}
+          {enraged && [...Array(10)].map((_, i) => (
+            <div key={i} style={{
+              position: 'absolute', left: `${(i * 11 + 8) % 100}%`, bottom: -10,
+              width: 4, height: 4, borderRadius: '50%',
+              background: i % 2 ? '#ff8800' : '#ffcc00',
+              boxShadow: '0 0 8px currentColor', opacity: 0,
+              animation: `ember 2.6s linear ${i * 200}ms infinite`,
+            }}/>
+          ))}
+          {/* battle line */}
+          <div style={{
+            position: 'absolute', left: 0, right: 0, top: '52%',
+            height: 2, background: enraged ? 'rgba(255,80,80,0.3)' : 'rgba(255,235,198,0.18)',
+            boxShadow: enraged ? '0 0 20px rgba(255,80,80,0.4)' : '0 0 16px rgba(255,235,198,0.18)',
+          }}/>
+        </div>
+      );
+    }
+
+    // ──────────────── MAIN ────────────────
+    function BossBattle() {
+      const HERO = { name: 'Ritter Finn', level: 3, hp: 28, maxHp: 28, ap: 8, klasse: 'Barbar' };
+      const BOSS = { name: 'Waldriese Bär', maxHp: 35, ap: 15, loot: 20 };
+
+      const [heroHp, setHeroHp] = useState(HERO.hp);
+      const [bossHp, setBossHp] = useState(BOSS.maxHp);
+      const [potions, setPotions] = useState(2);
+      const [special, setSpecial] = useState(2); // hero special charges
+      const [bossSpecialReady, setBossSpecialReady] = useState(false);
+      const [phase, setPhase] = useState(1);
+      const [phaseFx, setPhaseFx] = useState(0);   // key for phase 2 transition flash
+      const [phaseTitleK, setPhaseTitleK] = useState(0);
+      const [heroTurn, setHeroTurn] = useState(true);
+      const [defending, setDefending] = useState(false);
+      const [log, setLog] = useState([
+        `Du stehst vor ${BOSS.name}.`,
+        `Der Boss brüllt! Phase 1 beginnt.`,
+      ]);
+      const [ended, setEnded] = useState(null);
+
+      const [heroFx, setHeroFx] = useState({});
+      const [bossFx, setBossFx] = useState({});
+      const [screenFx, setScreenFx] = useState(null);
+      const [spiralK, setSpiralK] = useState(0);
+      const [slashK, setSlashK] = useState(0);
+
+      const busyRef = useRef(false);
+      const enraged = phase === 2;
+
+      // Trigger phase 2 when boss falls below 50%
+      useEffect(() => {
+        if (phase === 1 && bossHp <= BOSS.maxHp / 2 && bossHp > 0 && !ended) {
+          setPhase(2);
+          setBossSpecialReady(true);
+          setLog(l => [...l, `🔥 ${BOSS.name} gerät in Raserei! Seine Angriffe sind nun stärker!`]);
+          setScreenFx({ kind: 'red', k: Date.now() });
+          setPhaseTitleK(Date.now());
+        }
+      }, [bossHp]);
+
+      // Boss turn logic
+      useEffect(() => {
+        if (ended || heroTurn) return;
+        busyRef.current = true;
+
+        const useSpecial = bossSpecialReady && phase === 2 && Math.random() < 0.65;
+
+        const t1 = setTimeout(() => {
+          // wind-up
+          setBossFx({ attacking: true });
+          if (useSpecial) {
+            setBossFx({ attacking: true, special: true });
+            setSpiralK(Date.now());
+          }
+          setTimeout(() => setBossFx({}), 500);
+        }, 700);
+
+        const t2 = setTimeout(() => {
+          let dmg = useSpecial ? BOSS.ap + 7 : BOSS.ap;
+          const label = useSpecial ? 'TATZEN-SCHLAG!' : 'Biss';
+          if (defending) {
+            dmg = Math.max(1, Math.floor(dmg / 2));
+          }
+          setHeroHp(h => {
+            const nh = Math.max(0, h - dmg);
+            const lines = [`${BOSS.name} setzt ${label} ein! ${dmg} Schaden${defending ? ' (geblockt)' : ''}.`];
+            if (nh <= 0) { lines.push(`Du wurdest besiegt…`); setEnded('lose'); }
+            setLog(l => [...l, ...lines]);
+            return nh;
+          });
+          setHeroFx({ hurt: true, floatText: { k: Date.now(), text: `-${dmg}`, color: '#ff6a6a' } });
+          if (useSpecial) setScreenFx({ kind: 'white', k: Date.now() });
+          setTimeout(() => setHeroFx({}), 900);
+          if (useSpecial) setBossSpecialReady(false);
+        }, 1300);
+
+        const t3 = setTimeout(() => {
+          setDefending(false);
+          if (!ended) setHeroTurn(true);
+          // recharge boss special after 2 turns
+          if (phase === 2 && !bossSpecialReady) {
+            setTimeout(() => setBossSpecialReady(true), 0);
+          }
+          busyRef.current = false;
+        }, 2000);
+
+        return () => [t1,t2,t3].forEach(clearTimeout);
+      }, [heroTurn, ended]);
+
+      const heroAttack = () => {
+        if (!heroTurn || ended || busyRef.current) return;
+        busyRef.current = true;
+        setHeroFx({ attacking: true });
+        setTimeout(() => setHeroFx({}), 320);
+        setTimeout(() => {
+          const dmg = HERO.ap;
+          setBossHp(b => {
+            const nb = Math.max(0, b - dmg);
+            const lines = [`${HERO.name} schlägt zu! ${dmg} Schaden.`];
+            if (nb <= 0) { lines.push(`🏆 ${BOSS.name} fällt mit dröhnendem Schlag!`); setEnded('win'); }
+            setLog(l => [...l, ...lines]);
+            return nb;
+          });
+          setBossFx({ hurt: true, floatText: { k: Date.now(), text: `-${dmg}`, color: C.yellow } });
+          setTimeout(() => setBossFx({}), 800);
+          setTimeout(() => { if (!ended) setHeroTurn(false); busyRef.current = false; }, 800);
+        }, 320);
+      };
+
+      const heroSpecial = () => {
+        if (!heroTurn || ended || busyRef.current || special <= 0) return;
+        busyRef.current = true;
+        setSpecial(s => s - 1);
+        setSlashK(Date.now());
+        setHeroFx({ attacking: true });
+        setTimeout(() => setHeroFx({}), 320);
+        setTimeout(() => {
+          const dmg = HERO.ap * 2 + 2;
+          setBossHp(b => {
+            const nb = Math.max(0, b - dmg);
+            const lines = [`✨ ${HERO.name} entfesselt KLINGENWIRBEL! ${dmg} Schaden!`];
+            if (nb <= 0) { lines.push(`🏆 ${BOSS.name} fällt mit dröhnendem Schlag!`); setEnded('win'); }
+            setLog(l => [...l, ...lines]);
+            return nb;
+          });
+          setBossFx({ hurt: true, floatText: { k: Date.now(), text: `-${dmg}!`, color: '#fff3a8' } });
+          setScreenFx({ kind: 'white', k: Date.now() });
+          setTimeout(() => setBossFx({}), 1000);
+          setTimeout(() => { if (!ended) setHeroTurn(false); busyRef.current = false; }, 1000);
+        }, 350);
+      };
+
+      const heroDefend = () => {
+        if (!heroTurn || ended || busyRef.current) return;
+        busyRef.current = true;
+        setDefending(true);
+        setLog(l => [...l, `${HERO.name} hebt den Schild — eingehender Schaden halbiert.`]);
+        setTimeout(() => { setHeroTurn(false); busyRef.current = false; }, 600);
+      };
+
+      const heroPotion = () => {
+        if (!heroTurn || ended || busyRef.current || potions <= 0) return;
+        busyRef.current = true;
+        setPotions(p => p - 1);
+        const heal = 14;
+        setHeroHp(h => Math.min(HERO.maxHp, h + heal));
+        setHeroFx({ floatText: { k: Date.now(), text: `+${heal}`, color: '#6be289' } });
+        setLog(l => [...l, `${HERO.name} trinkt einen Heiltrank. +${heal} LP.`]);
+        setTimeout(() => setHeroFx({}), 800);
+        setTimeout(() => { setHeroTurn(false); busyRef.current = false; }, 900);
+      };
+
+      const reset = () => {
+        setHeroHp(HERO.hp); setBossHp(BOSS.maxHp);
+        setPotions(2); setSpecial(2); setPhase(1); setBossSpecialReady(false);
+        setHeroTurn(true); setEnded(null); setDefending(false);
+        setLog([`Du stehst vor ${BOSS.name}.`, `Der Boss brüllt! Phase 1 beginnt.`]);
+        setHeroFx({}); setBossFx({}); setScreenFx(null);
+        busyRef.current = false;
+      };
+
+      const backToMap = () => { window.location.href = 'Wunderwald Map.html'; };
+
+      return (
+        <div data-screen-label="04 Boss-Kampf" style={{
+          position: 'relative', width: '100%', height: '100%', overflow: 'hidden',
+        }}>
+          <Arena enraged={enraged}/>
+
+          {/* top bar */}
+          <div style={{
+            position: 'relative', zIndex: 4,
+            padding: '56px 14px 8px',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          }}>
+            <button onClick={backToMap} style={{
+              background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,235,198,0.3)',
+              color: C.cream, width: 36, height: 36, borderRadius: 18,
+              fontSize: 18, cursor: 'pointer', fontFamily: 'inherit',
+            }}>←</button>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{
+                color: enraged ? '#ff8a8a' : C.yellow, fontSize: 18, fontWeight: 900, letterSpacing: 3,
+                textShadow: '0 2px 0 rgba(0,0,0,0.5)',
+              }}>👑 BOSS-KAMPF</div>
+              <div style={{ color: C.cream, fontSize: 10, fontWeight: 800, letterSpacing: 2, opacity: 0.8 }}>
+                PHASE {phase} {enraged && '· RASEND'}
+              </div>
+            </div>
+            <div style={{ width: 36 }}/>
+          </div>
+
+          {/* Boss header strip */}
+          <div style={{
+            position: 'relative', zIndex: 2,
+            padding: '4px 14px 0',
+          }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              marginBottom: 4,
+            }}>
+              <div style={{ color: C.cream, fontSize: 18, fontWeight: 900, letterSpacing: 0.5,
+                textShadow: '0 2px 0 rgba(0,0,0,0.5)' }}>
+                {BOSS.name}
+              </div>
+              <div style={{
+                fontSize: 10, fontWeight: 900, letterSpacing: 2,
+                background: enraged ? '#5a1010' : C.bossDeep,
+                color: enraged ? '#ff8a8a' : '#d4a8f0',
+                padding: '3px 10px', borderRadius: 8,
+                border: `1px solid ${enraged ? '#ff404044' : '#a257c844'}`,
+              }}>
+                AP {enraged ? BOSS.ap + 7 : BOSS.ap}
+              </div>
+            </div>
+            <BossHPBar cur={bossHp} max={BOSS.maxHp} enraged={enraged}/>
+          </div>
+
+          {/* Boss sprite */}
+          <div style={{
+            position: 'relative', zIndex: 2,
+            display: 'flex', justifyContent: 'center',
+            marginTop: 16, marginBottom: 4,
+            height: 180,
+          }}>
+            <BossSprite
+              active={!heroTurn && !ended}
+              hurt={bossFx.hurt} attacking={bossFx.attacking} special={bossFx.special}
+              enraged={enraged} floatText={bossFx.floatText}
+            />
+            {spiralK ? <SpiralFX k={spiralK}/> : null}
+          </div>
+
+          {/* Battle log */}
+          <div style={{ position: 'relative', zIndex: 2, padding: '0 14px', marginBottom: 6 }}>
+            <BossLog entries={log} isHeroTurn={heroTurn} ended={!!ended} enraged={enraged}/>
+          </div>
+
+          {/* Hero card */}
+          <div style={{ position: 'relative', zIndex: 2, padding: '0 14px', marginBottom: 6 }}>
+            <div style={{
+              background: `${C.cream}f2`, borderRadius: 14, padding: 10,
+              display: 'flex', alignItems: 'center', gap: 12,
+              boxShadow: '0 4px 0 rgba(0,0,0,0.2)',
+            }}>
+              <div style={{ position: 'relative', width: 80, height: 80, flexShrink: 0 }}>
+                <HeroSprite
+                  active={heroTurn && !ended}
+                  hurt={heroFx.hurt} attacking={heroFx.attacking} defending={defending}
+                  floatText={heroFx.floatText}
+                />
+                {slashK ? <SlashFX k={slashK}/> : null}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
+                  <div style={{ fontSize: 14, fontWeight: 900, color: C.midnight }}>
+                    {HERO.name}
+                    <span style={{ fontWeight: 700, fontSize: 11, opacity: 0.7, marginLeft: 6 }}>
+                      Lvl {HERO.level} · {HERO.klasse}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: 10, fontWeight: 800, color: C.caribbean }}>AP {HERO.ap}</div>
+                </div>
+                <HeroHPBar cur={heroHp} max={HERO.maxHp}/>
+              </div>
+            </div>
+          </div>
+
+          {/* Action grid */}
+          <div style={{
+            position: 'absolute', left: 0, right: 0, bottom: 24, padding: '0 14px', zIndex: 4,
+          }}>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+              <ActionBtn
+                title="Schwerthieb"
+                sub={`${HERO.ap} AP · Standard`}
+                icon="⚔️"
+                color={C.yellow}
+                disabled={!heroTurn || !!ended}
+                highlight={heroTurn && !ended}
+                onClick={heroAttack}
+              />
+              <ActionBtn
+                title="Klingenwirbel"
+                sub={special > 0 ? `${HERO.ap*2+2} AP · ${special} Ladung${special>1?'en':''}` : 'Verbraucht'}
+                icon="✨"
+                color={C.pink}
+                disabled={!heroTurn || !!ended || special <= 0}
+                onClick={heroSpecial}
+              />
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <ActionBtn
+                title="Verteidigen"
+                sub="Halbiert nächsten Treffer"
+                icon="🛡️"
+                color={C.caribbean}
+                disabled={!heroTurn || !!ended}
+                onClick={heroDefend}
+              />
+              <ActionBtn
+                title="Heiltrank"
+                sub={potions > 0 ? `+14 LP · ${potions}×` : 'Leer'}
+                icon="🧪"
+                color="#5a8a3a"
+                disabled={!heroTurn || !!ended || potions <= 0}
+                onClick={heroPotion}
+              />
+            </div>
+          </div>
+
+          {/* Phase / screen FX overlays */}
+          {screenFx && <ScreenFlash kind={screenFx.kind} k={screenFx.k}/>}
+          {phaseTitleK ? <PhaseTitle k={phaseTitleK}/> : null}
+
+          {ended && (
+            <EndDialog
+              victory={ended === 'win'}
+              name={BOSS.name}
+              loot={BOSS.loot}
+              onBack={backToMap}
+              onRetry={reset}
+            />
+          )}
+        </div>
+      );
+    }
+
+    function Root() {
+      return (
+        <IOSDevice dark={true}>
+          <BossBattle/>
+        </IOSDevice>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<Root/>);
+  </script>
+</body>
+</html>
