@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Besen & Bestien - Mach Hausarbeit zum Abenteuer</title>
+    <meta name="description" content="Meine App hilft Familien mit ADHS dabei, den Haushalt stressfrei zu meistern, indem reale Pflichten spielerisch belohnt werden." />
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="container nav-content">
+        <div class="logo">Besen & Bestien</div>
+        <div class="nav-links">
+          <a href="#problem">Die Idee</a>
+          <a href="#product">Das Spiel</a>
+          <a href="#about">Über mich</a>
+        </div>
+      </div>
+    </nav>
+
+    <header class="hero">
+      <div class="container hero-content">
+        <div class="hero-text">
+          <h1>Hausarbeit<br/><span class="highlight">stressfrei & spielerisch</span> meistern</h1>
+          <p class="pitch">
+            Meine App hilft Familien mit ADHS dabei, den Haushalt stressfrei zu meistern, indem reale Pflichten spielerisch belohnt werden, anstatt auf öde Sternchen- oder To-Do-Listen zu setzen.
+          </p>
+          <div class="cta-box">
+            <h3>Bleib auf dem Laufenden!</h3>
+            <form id="newsletter-form" class="newsletter-form">
+              <input type="email" placeholder="Deine E-Mail Adresse" required />
+              <button type="submit" class="btn btn-primary">Abonnieren</button>
+            </form>
+            <p class="contact-hint">Oder schreib mir direkt: <a href="mailto:jana.fisenko@example.com">jana.fisenko@example.com</a></p>
+          </div>
+        </div>
+        <div class="hero-image">
+          <img src="/assets/Portalprototyp.png" alt="Besen & Bestien Portalprototyp" class="floating-image" />
+        </div>
+      </div>
+    </header>
+
+    <section id="problem" class="problem-solution section">
+      <div class="container">
+        <div class="comparison">
+          <div class="card bad">
+            <div class="card-icon">😩</div>
+            <h2>Das Problem</h2>
+            <p>Endlose Diskussionen, vergessene Aufgaben und öde Sternchen-Listen, die schnell ihren Reiz verlieren. Für Familien mit ADHS ist die Hausarbeit oft ein täglicher Kampf.</p>
+          </div>
+          <div class="card good">
+            <div class="card-icon">🚀</div>
+            <h2>Die Lösung</h2>
+            <p>Ein interaktives RPG-Abenteuer! Jede erledigte Pflicht im echten Leben gibt Schritte und XP für das Spiel. Bosskämpfe, Loot und Level-Ups statt langweiliger To-Do-Listen.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="product" class="product section">
+      <div class="container">
+        <h2 class="section-title">Erlebe das Abenteuer</h2>
+        <p class="section-subtitle">Probier unsere interaktiven Prototypen aus!</p>
+        
+        <div class="prototypes-grid">
+          <div class="prototype-card">
+            <h3>Der Boss Kampf</h3>
+            <div class="iframe-container">
+              <iframe src="/designfiles/Boss Kampf.html" frameborder="0"></iframe>
+            </div>
+          </div>
+          <div class="prototype-card">
+            <h3>Der Schatz Screen</h3>
+            <div class="iframe-container">
+              <iframe src="/designfiles/Schatz Screen.html" frameborder="0"></iframe>
+            </div>
+          </div>
+          <div class="prototype-card">
+            <h3>Mimikry Flip</h3>
+            <div class="iframe-container">
+              <iframe src="/designfiles/Mimikry Flip.html" frameborder="0"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="about section">
+      <div class="container about-content">
+        <div class="about-text">
+          <h2 class="section-title">Über mich</h2>
+          <p>Hi, ich bin <strong>Jana Fisenko</strong>!</p>
+          <p>Ich studiere aktuell im 5. Semester Medieninformatik an der Hochschule Emden. Aus meiner eigenen Erfahrung und Leidenschaft heraus entstand die Idee für "Besen & Bestien".</p>
+          <p>Mein Gründungsvorhaben <strong>capyvision</strong> wird derzeit im Rahmen des <span class="highlight">Exist Women</span> Programms unterstützt. Gemeinsam arbeiten wir daran, Familien den Alltag zu erleichtern und Hausarbeit endlich zu einem gemeinsamen Abenteuer zu machen.</p>
+        </div>
+        <div class="about-images">
+          <!-- Platzhalter, falls Bilder später hochgeladen werden -->
+          <div class="image-wrapper">
+             <img src="/assets/jana-fisenko.jpg" alt="Jana Fisenko Portrait" onerror="this.src='https://via.placeholder.com/300x400?text=Jana+Fisenko'" />
+          </div>
+          <div class="image-wrapper exist-logo">
+             <img src="/assets/exist-logo.jpg" alt="Exist Women Logo" onerror="this.src='https://via.placeholder.com/300x150?text=EXIST+Women+Logo'" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="container footer-content">
+        <div class="footer-info">
+          <h3>capyvision (in Gründung)</h3>
+          <p>Jana Fisenko</p>
+          <a href="mailto:jana.fisenko@example.com">jana.fisenko@example.com</a>
+        </div>
+        <div class="footer-links">
+          <h4>Rechtliches</h4>
+          <a href="#" id="impressum-link">Impressum & Datenschutz</a>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Impressum Modal -->
+    <div id="impressum-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>Impressum</h2>
+        <p><strong>Angaben gemäß § 5 TMG</strong></p>
+        <p>Jana Fisenko<br />
+        [Deine Straße und Hausnummer]<br />
+        [Deine PLZ und Ort]<br />
+        Deutschland</p>
+        <p><strong>Kontakt</strong><br />
+        E-Mail: <a href="mailto:jana.fisenko@example.com">jana.fisenko@example.com</a></p>
+        <p><em>Da capyvision sich in der Gründungsphase befindet, wird das Projekt derzeit als Einzelunternehmen/Projekt von Jana Fisenko geführt.</em></p>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
