@@ -65,3 +65,37 @@
 ## Phase 2 (Post-MVP)
 - [ ] **F19** – Mehrere Welten / Biome mit biom-spezifischen Bestien
 - [ ] **F20** – NFC-Login (Phase 2)
+
+---
+
+## Spec-Abgleich `main`-Konzept (Stand 2026-06-24) ##
+
+> Vergleich von `docs/konzept/Spielmechanik.txt` (aus dem nativen `main`-Branch) gegen die aktuelle master-Implementierung.
+> Die Rechen-Engine (XP/Level/Kampf/Bestien/Karte) passt; die Lücken liegen in Belohnungs-Kernregeln und Content-Breite.
+
+### 🟠 Belohnungssystem – Mechanik weicht von Spec ab
+
+- [ ] **G1** – Altersbasierte Wochenlimit-Tabelle umsetzen (unter 6 J. = 10 Münzen, 6 J. = 20 … 12 J. = 65). Aktuell pauschal `weeklyGoal = 20`. (erweitert **F6**)
+- [ ] **G2** – Edelsteine *sofort* ab erreichtem Wochenziel: jeder weitere Kampf bringt Edelsteine (gleiche Höhe) statt Münzen. Aktuell laufen Münzen weiter, nur +1 Edelstein pauschal beim Wochenwechsel (`AuthContext.tsx`). (erweitert **F6**)
+- [ ] **G3** – Verfallsmechanik spec-konform: unter Wochenlimit verfallen **alle** Münzen der Woche (aktuell 50%-Sparschwein-Eigenlogik). Mit DM ggf. abstimmen, ob Sparschwein bewusst gewünscht ist. (betrifft **F6**)
+- [ ] **G4** – Klassen-Boni vervollständigen: **Schritt-** und **Münz-Modifikatoren** fehlen (Barbar −1 Schritt, Druide +2 Schritte, Zauberer −1 Münze, Schurke +2 Münzen). Aktuell nur HP/AP (`types/game.ts`). (erweitert **F4**)
+
+### 🟡 Content-Breite fehlt
+
+- [ ] **G5** – Level-Angriffe: pro Klasse 10 Angriffe (Lvl 1–90) inkl. Spezialeffekte (Verwirrung, −AP, Verfehlen, Aussetzen…). Aktuell ein Angriff je Klasse ohne Effekt. In **erweiterbare Einzeldateien** je Klasse auslagern (lt. Allgemeine-Regeln). (erweitert **F3/F4**)
+- [ ] **G6** – Shop auf die 50 Spec-Items erweitern (Ausrüstung, Tränke, Kosmetik/Begleiter, Boosts, Sammelobjekte). Aktuell 4 mit echtem Effekt. (erweitert **F8**)
+- [ ] **G7** – 7 echte Welten mit korrekten Namen + Biom-spezifischen Bestien-Pools (Wunderwald, Todeswüste, Verbotenes Meer, Verlorene Stadt, Dunkelmine, Feuerinsel, Modersumpf). Aktuell 4 frei erfundene Welten. (präzisiert **F19**)
+- [ ] **G8** – Mimikry: Bestie, die auf der Karte als Schatz getarnt erscheint.
+
+### 🟢 Feinschliff / Spec-Treue
+
+- [ ] **G9** – Avatar des Helden im Kampf anzeigen statt hartkodiertem 🧙‍♂️ (`CombatModal.tsx`). (betrifft **F3/F5**)
+- [ ] **G10** – Avatar-Designer: Aussehen über **Slider mit mehreren Bildern je Klasse** (aktuell nur Emoji + Farbe). (erweitert **F5**)
+- [ ] **G11** – Tagebuch-Sticker spec-konform: je besiegter Bestie / neu betretener Welt / erreichtem Wochenziel / Aufgabe über Ziel – statt reiner Aufgaben-Anzahl. (erweitert **F13**)
+- [ ] **G12** – Bücher der Bestien/Welten: **Entdeckt-Checkbox + Fortschrittsleiste** (welche besiegt/betreten). Aktuell statische Liste ohne Tracking. (erweitert **F12**)
+- [ ] **G13** – Spielanleitung in der Bibliothek ergänzen.
+- [ ] **G14** – Aufgaben: **Deadline** (Mo–So) + monatliche / wochentag-spezifische Wiederholung (z. B. jeden Mo/Mi/Fr). Aktuell nur daily/weekly. (erweitert **F11**)
+- [ ] **G15** – Tutorial beim ersten Spielstart (je nach NFC-/virtueller Figur angepasst).
+- [ ] **G16** – Sounds / kurze Erfolgsmelodien (aktuell nur Haptik). (betrifft **F16**)
+- [ ] **G17** – Benachrichtigungstext dynamisch: „Noch X Münzen bis zum Taschengeld!" statt statischem Text. (erweitert **F14**)
+- [ ] **G18** – Restschritte nach einem Kampf automatisch weiterlaufen (`move()` stoppt aktuell an der Bestie). (betrifft **B2**)
