@@ -75,10 +75,10 @@
 
 ### 🟠 Belohnungssystem – Mechanik weicht von Spec ab
 
-- [ ] **G1** – Altersbasierte Wochenlimit-Tabelle umsetzen (unter 6 J. = 10 Münzen, 6 J. = 20 … 12 J. = 65). Aktuell pauschal `weeklyGoal = 20`. (erweitert **F6**)
-- [ ] **G2** – Edelsteine *sofort* ab erreichtem Wochenziel: jeder weitere Kampf bringt Edelsteine (gleiche Höhe) statt Münzen. Aktuell laufen Münzen weiter, nur +1 Edelstein pauschal beim Wochenwechsel (`AuthContext.tsx`). (erweitert **F6**)
-- [ ] **G3** – Verfallsmechanik spec-konform: unter Wochenlimit verfallen **alle** Münzen der Woche (aktuell 50%-Sparschwein-Eigenlogik). Mit DM ggf. abstimmen, ob Sparschwein bewusst gewünscht ist. (betrifft **F6**)
-- [ ] **G4** – Klassen-Boni vervollständigen: **Schritt-** und **Münz-Modifikatoren** fehlen (Barbar −1 Schritt, Druide +2 Schritte, Zauberer −1 Münze, Schurke +2 Münzen). Aktuell nur HP/AP (`types/game.ts`). (erweitert **F4**)
+- [x] **G1** – Altersbasierte Wochenlimit-Tabelle umsetzen (unter 6 J. = 10 Münzen, 6 J. = 20 … 12 J. = 65). `weeklyGoalForAge()` + `getWeeklyGoal()` in `types/game.ts`; `age`-Feld am User; Eltern setzen das Alter im DM-Bereich (`children.tsx`), eigenes `weeklyGoal` überschreibt die Tabelle. (erweitert **F6**)
+- [x] **G2** – Edelsteine *sofort* ab erreichtem Wochenziel: `awardLoot()` in `AuthContext.tsx` verteilt Loot auf Münzen bis zum Wochenziel, danach auf Edelsteine (gleiche Höhe). Genutzt in Kampf (`CombatModal.tsx`) und Schatz (`GameContext.tsx`). (erweitert **F6**)
+- [x] **G3** – *Bewusste Abweichung von der Spec (DM-Entscheidung 2026-06-24):* Sparschwein-Mechanik (50% Roll-over) wird **absichtlich beibehalten** statt spec-konform alle Münzen verfallen zu lassen – kinderfreundlicher. Keine Code-Änderung. (betrifft **F6**)
+- [x] **G4** – Klassen-Boni vervollständigt: **Schritt-** und **Münz-Modifikatoren** ergänzt (Barbar −1 Schritt, Druide +2 Schritte, Zauberer −1 Münze, Schurke +2 Münzen). Zentral via `getClassBonus()` in `types/game.ts`; Schritt-Bonus bei Aufgabenabschluss (`TaskContext.tsx`), Münz-Bonus bei Kampf/Schatz; angezeigt in Profil & Bibliothek. (erweitert **F4**)
 
 ### 🟡 Content-Breite fehlt
 
