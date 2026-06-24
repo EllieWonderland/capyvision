@@ -82,10 +82,10 @@
 
 ### 🟡 Content-Breite fehlt
 
-- [ ] **G5** – Level-Angriffe: pro Klasse 10 Angriffe (Lvl 1–90) inkl. Spezialeffekte (Verwirrung, −AP, Verfehlen, Aussetzen…). Aktuell ein Angriff je Klasse ohne Effekt. In **erweiterbare Einzeldateien** je Klasse auslagern (lt. Allgemeine-Regeln). (erweitert **F3/F4**)
-- [ ] **G6** – Shop auf die 50 Spec-Items erweitern (Ausrüstung, Tränke, Kosmetik/Begleiter, Boosts, Sammelobjekte). Aktuell 4 mit echtem Effekt. (erweitert **F8**)
-- [ ] **G7** – 7 echte Welten mit korrekten Namen + Biom-spezifischen Bestien-Pools (Wunderwald, Todeswüste, Verbotenes Meer, Verlorene Stadt, Dunkelmine, Feuerinsel, Modersumpf). Aktuell 4 frei erfundene Welten. (präzisiert **F19**)
-- [ ] **G8** – Mimikry: Bestie, die auf der Karte als Schatz getarnt erscheint.
+- [x] **G5** – Level-Angriffe: pro Klasse 10 Angriffe (Lvl 1–90) in **erweiterbaren Einzeldateien** je Klasse (`types/classes/{warrior,druid,mage,rogue}.ts` + `attacks.ts` + `index.ts`). Spezialeffekte im Kampf umgesetzt: Verwirrung (−AP), Verfehlen, Aussetzen, halbe AP, Selbst-Buff (+AP nächster Angriff) und Doppel-/Mehrfachtreffer; jeder 10. Level schaltet einen neuen Angriff frei. Angriffsauswahl in `CombatModal.tsx`, Anzeige in Profil & Buch der Klassen. (erweitert **F3/F4**)
+- [x] **G6** – Shop auf die 50 Spec-Items erweitert (`MOCK_SHOP_ITEMS` in `types/index.ts`: Ausrüstung, Tränke, Kosmetik/Begleiter, Boosts, Sammelobjekte). Neues `effect`-Feld (`ShopEffect`) treibt `buyItem()` effektbasiert; neuer `hpBonus`-Stat für +LP-Ausrüstung (Gürtel/Rüstung/Helm). Optik-/Sammel-/Begleiter-/Boost-Items werden gekauft, haben aber (noch) keinen festen Kampf-Effekt. Seeding ergänzt fehlende Default-Items automatisch. (erweitert **F8**)
+- [x] **G7** – 7 echte Welten mit korrekten Namen + Biom + biom-spezifischen Bestien-Pools (`WORLDS` mit `biome`/`beastIds`). Fehlende Roster-Bestien Qualle & Leguan ergänzt; `getWorldBeast()` wählt aus dem Pool der aktiven Welt; Karten-Header & Buch der Welten zeigen Biom + Bestien. Welten-Wechsel bleibt Phase 2 (**F19**). (präzisiert **F19**)
+- [x] **G8** – Mimikry: `getMimicBeast()`; in `GameContext.tsx` entpuppen sich 30 % der Schätze beim Betreten als getarnte Mimikry-Bestie (auf der Karte als 💎 sichtbar → Kampf statt Loot).
 
 ### 🟢 Feinschliff / Spec-Treue
 
