@@ -89,13 +89,13 @@
 
 ### 🟢 Feinschliff / Spec-Treue
 
-- [ ] **G9** – Avatar des Helden im Kampf anzeigen statt hartkodiertem 🧙‍♂️ (`CombatModal.tsx`). (betrifft **F3/F5**)
-- [ ] **G10** – Avatar-Designer: Aussehen über **Slider mit mehreren Bildern je Klasse** (aktuell nur Emoji + Farbe). (erweitert **F5**)
-- [ ] **G11** – Tagebuch-Sticker spec-konform: je besiegter Bestie / neu betretener Welt / erreichtem Wochenziel / Aufgabe über Ziel – statt reiner Aufgaben-Anzahl. (erweitert **F13**)
-- [ ] **G12** – Bücher der Bestien/Welten: **Entdeckt-Checkbox + Fortschrittsleiste** (welche besiegt/betreten). Aktuell statische Liste ohne Tracking. (erweitert **F12**)
-- [ ] **G13** – Spielanleitung in der Bibliothek ergänzen.
-- [ ] **G14** – Aufgaben: **Deadline** (Mo–So) + monatliche / wochentag-spezifische Wiederholung (z. B. jeden Mo/Mi/Fr). Aktuell nur daily/weekly. (erweitert **F11**)
-- [ ] **G15** – Tutorial beim ersten Spielstart (je nach NFC-/virtueller Figur angepasst).
-- [ ] **G16** – Sounds / kurze Erfolgsmelodien (aktuell nur Haptik). (betrifft **F16**)
-- [ ] **G17** – Benachrichtigungstext dynamisch: „Noch X Münzen bis zum Taschengeld!" statt statischem Text. (erweitert **F14**)
-- [ ] **G18** – Restschritte nach einem Kampf automatisch weiterlaufen (`move()` stoppt aktuell an der Bestie). (betrifft **B2**)
+- [x] **G9** – Held-Avatar im Kampf (`CombatModal.tsx`) und auf der Karte (`map.tsx`) statt hartkodiertem 🧙‍♂️: nutzt `avatarConfig` (Gesicht + Farbe), Fallback Klassen-Emoji/-Farbe. (betrifft **F3/F5**)
+- [x] **G10** – Avatar-Designer als **Slider** mit klassenspezifischen Bildern: `CLASS_FACES`/`getClassFaces()` in `types/game.ts`; Pfeil-Slider + Positions-Punkte in `profile.tsx` (statt fester Emoji-Grid). (erweitert **F5**)
+- [x] **G11** – Tagebuch-Sticker spec-konform: neue Karte „Sticker dieser Woche" (🐲 je Bestie, 🗺️ je neue Welt, 🏆 Wochenziel, ⭐ Aufgabe über Ziel) + Edelstein-Summe. Wöchentliche Zähler (`weeklyBeasts/weeklyWorlds/weeklyBonusTasks`) reset beim Wochenwechsel. (erweitert **F13**)
+- [x] **G12** – Bücher der Bestien/Welten: **Entdeckt-Checkbox (✅/⬜) + Fortschrittsleiste** über `defeatedBeasts`/`enteredWorlds` (in `User.stats`); erfasst bei Kampf-Sieg (`recordBeastDefeat`) bzw. Welt-Betreten (`recordWorldEntry`). (erweitert **F12**)
+- [x] **G13** – Spielanleitung als eigener Tab „Anleitung" in der Bibliothek (8 Schritte, kinderfreundlich). (erfüllt Spec „Bibliothek … Spielanleitung")
+- [x] **G14** – Aufgaben: **Deadline** (Wochentag Mo–So) + Wiederholung **monatlich** und **wochentag-spezifisch** (z. B. Mo/Mi/Fr). Task-Typ um `recurring: 'monthly'|'weekdays'`, `weekdays[]`, `deadline` erweitert; Auto-Reset-Logik & DM-Formular angepasst. (erweitert **F11**)
+- [x] **G15** – Tutorial beim ersten Spielstart (`components/Tutorial.tsx`, 5 Slides) – einmalig pro Held über `tutorialSeen`-Flag. Aktuell für virtuelle Figur; NFC-Variante folgt mit **F20**. 
+- [x] **G16** – Kurze Erfolgsmelodien (`lib/sound.ts`, `playJingle`): Sieg/Niederlage/Aufgabe/Schatz. Assetfrei über Web-Audio (Web-Build); auf nativen Plattformen bleibt vorerst die Haptik (Audio-Dateien + Audio-Modul = Folge-Schritt). (betrifft **F16**)
+- [x] **G17** – Benachrichtigungstext dynamisch: „Noch X Münzen bis zum Taschengeld!" – `buildReminders(ctx)` in `notifications.ts`, Reminder werden bei Münzstand-Änderung neu geplant (`_layout.tsx`). (erweitert **F14**)
+- [x] **G18** – Restschritte nach gewonnenem Kampf laufen automatisch weiter: `move()`/`resumeMove()` + `pendingSteps` in `GameContext`; nach Niederlage werden die Restschritte (via `pushBack`) verworfen. (betrifft **B2**)
